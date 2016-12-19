@@ -79,6 +79,7 @@
 #' \item{fnG0}{A list of lists containing relevant information needed to reproduce data sets}
 #' \item{fnQ0}{A list of lists containing relevant information needed to reproduce data sets}
 #' \item{distErrY}{A list containing relevant information needed to reproduce data sets}
+#' @export
 
 makeRandomData <- function(n, 
                            maxD,  

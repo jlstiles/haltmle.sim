@@ -1,4 +1,4 @@
-Package: halTMLE_sim
+Package: haltmle.sim
 Title: Simulation study for HAL-TMLE
 Version: 0.0.0.9000
 Authors@R: person("David", "Benkeser", email = "benkeser@berkeley.edu", role = c("aut", "cre"))
