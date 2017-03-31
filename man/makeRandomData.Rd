@@ -6,12 +6,14 @@
 \usage{
 makeRandomData(n, maxD, distW.uncor = c("uniformW", "normalW", "bernoulliW",
   "binomialW", "gammaW"), distW.cor = c("normalWCor", "bernoulliWCor",
-  "uniformWCor"), funcG0.uni = c("linUni", "polyUni", "sinUni", "jumpUni"),
-  funcG0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv"),
-  funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"),
-  funcQ0.uni = c("linUni", "polyUni", "sinUni", "jumpUni"),
-  funcQ0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv"),
-  funcQ0.tri = c("linBiv", "polyBiv", "sinBiv", "jumpBiv"),
+  "uniformWCor"), funcG0.uni = c("linUni", "polyUni", "sinUni", "jumpUni",
+  "pLogisUni", "dNormUni", "qGammaUni", "dNormMixUni"),
+  funcG0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv", "dNormAddBiv",
+  "dNormMultBiv"), funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"),
+  funcQ0.uni = c("linUni", "polyUni", "sinUni", "jumpUni", "pLogisUni",
+  "dNormUni", "qGammaUni", "dNormMixUni"), funcQ0.biv = c("linBiv", "polyBiv",
+  "sinBiv", "jumpBiv", "dNormAddBiv", "dNormMultBiv"),
+  funcQ0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"),
   errY = c("normalErr", "uniformErr", "gammaErr", "normalErrW",
   "uniformErrW"), minG0 = 0.01, ...)
 }
@@ -53,8 +55,12 @@ An object of class \code{"makeRandomData"} with the following entries
 \item{fnG0}{A list of lists containing relevant information needed to reproduce data sets}
 \item{fnQ0}{A list of lists containing relevant information needed to reproduce data sets}
 \item{distErrY}{A list containing relevant information needed to reproduce data sets}
+\item{divideLogitG0}{A numeric of the scaling factor for the propensity}
 }
 \description{
+Simulate a random data generating distribution. See Details to see how it's done.
+}
+\details{
 Draw random data generating distribution. The code simulates as follows: \cr
 Simulate W \itemize{ 
 \item Choose \code{D}, a random number of covariates from Uniform(1,maxD)
@@ -66,8 +72,7 @@ Simulate W \itemize{
 \item Call \code{d2} with parameters chosen in previous step and first covariate (to possibly induce correlation with previous covariate) to generate second covariate. 
 \item Continue until \code{maxD} is reached.
 }
-}
-\details{
+
 Simulating A \itemize{
 \item Draw \code{MG1}, a random number of main terms for propensity score, from Uniform(1,maxD)
 \item For \code{i} = 1,...,\code{MG1}, draw \code{f} a random function from \code{funcG0.uni}

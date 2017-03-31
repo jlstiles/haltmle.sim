@@ -4,7 +4,7 @@
 \alias{uniformErrWParm}
 \title{uniformErrWParm}
 \usage{
-uniformErrWParm(rangeLower = 1, rangeUpper = 10)
+uniformErrWParm(rangeLower = 1, rangeUpper = 25)
 }
 \description{
 Generate parameters for \code{uniformErr}

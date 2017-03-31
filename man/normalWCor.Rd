@@ -4,7 +4,7 @@
 \alias{normalWCor}
 \title{normalWCor}
 \usage{
-normalWCor(n, x, sd)
+normalWCor(n, x, sd, ...)
 }
 \description{
 Draw normal variate with mean x (to induce correlation)

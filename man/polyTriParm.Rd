@@ -2,11 +2,11 @@
 % Please edit documentation in R/trivariateFunctions.R
 \name{polyTriParm}
 \alias{polyTriParm}
-\title{polyBivParm}
+\title{polyTriParm}
 \usage{
-polyTriParm(npolyLower = 1, npolyUpper = 2, coefLower = -0.25,
-  coefUpper = 0.25, deg1Lower = 1, deg1Upper = 3, deg2Lower = 1,
-  deg2Upper = 3, deg3Lower = 1, deg3Upper = 3, ...)
+polyTriParm(npolyLower = 1, npolyUpper = 1, coefLower = -0.1,
+  coefUpper = 0.1, deg1Lower = 1, deg1Upper = 2, deg2Lower = 1,
+  deg2Upper = 2, deg3Lower = 1, deg3Upper = 2, ...)
 }
 \description{
 Generate parameters for \code{polyTri}. See source code.

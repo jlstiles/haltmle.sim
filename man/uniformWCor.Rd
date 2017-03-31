@@ -4,7 +4,7 @@
 \alias{uniformWCor}
 \title{uniformWCor}
 \usage{
-uniformWCor(n, x, lower, upper)
+uniformWCor(n, x, lower, upper, ...)
 }
 \description{
 Draw variable that is x + uniform error (to induce correlation)

@@ -4,7 +4,7 @@
 \alias{bernoulliW}
 \title{bernoulliW}
 \usage{
-bernoulliW(n, p)
+bernoulliW(n, p, ...)
 }
 \description{
 Draw from Bernoulli(p)

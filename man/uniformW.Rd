@@ -4,7 +4,7 @@
 \alias{uniformW}
 \title{uniformW}
 \usage{
-uniformW(n, lower, upper)
+uniformW(n, lower, upper, ...)
 }
 \description{
 Draw from uniform(lower, upper) distribution

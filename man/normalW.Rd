@@ -4,7 +4,7 @@
 \alias{normalW}
 \title{normalW}
 \usage{
-normalW(n, mean, sd)
+normalW(n, mean, sd, ...)
 }
 \description{
 Draw from normal(mean,sd)

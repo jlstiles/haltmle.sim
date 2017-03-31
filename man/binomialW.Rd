@@ -4,7 +4,7 @@
 \alias{binomialW}
 \title{binomialW}
 \usage{
-binomialW(n, num, p)
+binomialW(n, num, p, ...)
 }
 \description{
 Draw from binomial(num, p)

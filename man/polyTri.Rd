@@ -5,7 +5,7 @@
 \title{polyTri
 Simulate a polynomial trivariate relationship}
 \usage{
-polyTri(x1, x2, x3, coef, deg1, deg2, deg3)
+polyTri(x1, x2, x3, npoly, coef, deg1, deg2, deg3)
 }
 \arguments{
 \item{x1}{A vector}
@@ -14,6 +14,8 @@ polyTri(x1, x2, x3, coef, deg1, deg2, deg3)
 
 \item{x3}{A vector}
 
+\item{npoly}{A numeric indicating the number of polynomial terms to simulate}
+
 \item{coef}{A vector indicating the coefficient for each polynomial term}
 
 \item{deg1}{A vector indicating the degree of the first polynomial term}
@@ -21,8 +23,6 @@ polyTri(x1, x2, x3, coef, deg1, deg2, deg3)
 \item{deg2}{A vector indicating the degree of the second polynomial term}
 
 \item{deg3}{A vector indicating the degree of the second polynomial term}
-
-\item{npoly}{A numeric indicating the number of polynomial terms to simulate}
 
 \item{coef}{A numeric coefficient}
 }

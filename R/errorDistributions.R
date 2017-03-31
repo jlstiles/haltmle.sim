@@ -9,8 +9,8 @@ normalErr <- function(n, sd, ...){
 #' 
 #' Draw a random standard deviation for \code{normalErr}
 #' @export
-normalErrParm <- function(sdLower = 0.5, sdUpper = 3){
-	return(runif(1, sdLower, sdUpper))
+normalErrParm <- function(sdLower = 0.5, sdUpper = 7){
+	return(list(sd = runif(1, sdLower, sdUpper)))
 }
 
 #' uniformErr
@@ -25,24 +25,26 @@ uniformErr <- function(n, range, ...){
 #' 
 #' Generate parameters for \code{uniformErr}
 #' @export
-uniformErrParm <- function(rangeLower = 1, rangeUpper = 10){
-	return(runif(1, rangeLower, rangeUpper))
+uniformErrParm <- function(rangeLower = 1, rangeUpper = 25){
+	return(list( range = runif(1, rangeLower, rangeUpper)))
 }
 
 
 #' gammaErr
 #' 
-#' Draw an error from a gamma distribution with particular range
+#' Draw an error from a shifted gamma distribution with particular range
 #' @export
-gammaW <- function(n,a,b, ...){
-	return(rgamma(n,a,b))
+gammaErr <- function(n,a,b,...){
+	tmp <- rgamma(n,a,b)
+	tmp <- tmp - mean(tmp)
+	return(tmp)
 }
 
 #' gammaErrParm
 #' Generate parameters for \code{gammaErr}
 #' @export
-gammaWParm <- function(aLower = 0.5, aUpper = 4.5,
-                      bLower = 0.5, bUpper = 4.5){
+gammaErrParm <- function(aLower = 0.1, aUpper = 7.5,
+                      bLower = 0.1, bUpper = 7.5){
 	return(list(a = runif(1, aLower, aUpper),
 	       b = runif(1, bLower, bUpper)))
 }
@@ -55,8 +57,8 @@ normalErrW <- function(n, sd, W){
 	err <- rep(0, length(W[,1]))
 	# binary W
 	if(all(W[,1] %in% c(0,1))){
-		err[W[,1] == 0] <- rnorm(n, 0, sd)
-		err[W[,1] == 1] <- rnorm(n, 0, 2*sd)
+		err[W[,1] == 0] <- rnorm(sum(W[,1]==0), 0, sd)
+		err[W[,1] == 1] <- rnorm(sum(W[,1]==1), 0, 2*sd)
 	}else{
 		err <- rnorm(n, 0, plogis(W[,1])*sd)
 	}
@@ -67,8 +69,8 @@ normalErrW <- function(n, sd, W){
 #' 
 #' Generate parameters for \code{normalErrUniW}
 #' @export
-normalErrWParm <- function(sdLower = 0.5, sdUpper = 3){
-	return(runif(1, sdLower, sdUpper))
+normalErrWParm <- function(sdLower = 0.5, sdUpper = 7){
+	return(list(sd = runif(1, sdLower, sdUpper)))
 }
 
 
@@ -77,14 +79,15 @@ normalErrWParm <- function(sdLower = 0.5, sdUpper = 3){
 #' Draw an error from a uniform distribution with range determined by W
 #' @export
 uniformErrW <- function(n, range, W){
-	err <- rep(0, length(W[,1]))
+	err <- rep(0, n)
 	# binary W
 	if(all(W[,1] %in% c(0,1))){
-		err[W[,1] == 0] <- runif(n, -range/2, range/2)
-		err[W[,1] == 1] <- runif(n, 0, -range, range)
+		err[W[,1] == 0] <- runif(sum(W[,1]==0), -range/2, range/2)
+		err[W[,1] == 1] <- runif(sum(W[,1]==1), -range, range)
 	}else{
 		err <- runif(n, -plogis(W[,1])*range, plogis(W[,1])*range)
 	}
+	return(err)
 }
 
 
@@ -92,7 +95,7 @@ uniformErrW <- function(n, range, W){
 #' 
 #' Generate parameters for \code{uniformErr}
 #' @export
-uniformErrWParm <- function(rangeLower = 1, rangeUpper = 10){
-	return(runif(1, rangeLower, rangeUpper))
+uniformErrWParm <- function(rangeLower = 1, rangeUpper = 25){
+	return(list(range = runif(1, rangeLower, rangeUpper)))
 }
 

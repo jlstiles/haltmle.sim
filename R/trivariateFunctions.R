@@ -37,22 +37,22 @@ linTriParm <- function(coefLower = -2, coefUpper = 2,...){
 #' @return Trivariate polynomial (see source code for details)
 #' @export
 
-polyTri <- function(x1, x2, x3, coef, deg1, deg2, deg3){
+polyTri <- function(x1, x2, x3, npoly, coef, deg1, deg2, deg3){
 	tmp <- rep(0, length(x1))
 	for(i in 1:npoly){
 		tmp <- tmp + coef[i]*x1^deg1[i]*x2^deg2[i]*x3^deg3[i]
 	}
 	return(tmp)
 }
-#' polyBivParm
+#' polyTriParm
 #' 
 #' Generate parameters for \code{polyTri}. See source code.
 #' @export
-polyTriParm <- function(npolyLower = 1, npolyUpper = 2, 
-                        coefLower = -0.25, coefUpper = 0.25, 
-                        deg1Lower = 1, deg1Upper = 3, 
-                        deg2Lower = 1, deg2Upper = 3,
-                        deg3Lower = 1, deg3Upper = 3,
+polyTriParm <- function(npolyLower = 1, npolyUpper = 1, 
+                        coefLower = -0.1, coefUpper = 0.1, 
+                        deg1Lower = 1, deg1Upper = 2, 
+                        deg2Lower = 1, deg2Upper = 2,
+                        deg3Lower = 1, deg3Upper = 2,
                         ...){
 	npoly <- round(runif(1,npolyLower - 0.5, npolyUpper + 0.5))
 	coef <- runif(npoly, coefLower, coefUpper)
@@ -102,7 +102,7 @@ sinTriParm <- function(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1,...)
 #' @return The value of the jump function. 
 #' @export
 jumpTri <- function(x1, x2, x3, njump, jumpLoc1, jumpLoc2, jumpLoc3, jumpVal){
-	tmp <- rep(0, length(x))
+	tmp <- rep(0, length(x1))
 	for(i in 1:(length(jumpLoc1)-1)){
 		ind <- (x1 <= jumpLoc1[i+1] & x1 >= jumpLoc1[i] & x2 <= jumpLoc2[i] & x2 >= jumpLoc2[i] &
 		        x3 <= jumpLoc3[i] & x3 >= jumpLoc3[i+1])
@@ -114,7 +114,7 @@ jumpTri <- function(x1, x2, x3, njump, jumpLoc1, jumpLoc2, jumpLoc3, jumpVal){
 #' 
 #' Generate parameters for \code{jumpTri}. See source code and \code{?jumpUni}.
 #' @export 
-jumpTriParm <- function(x, njumpLower = 1, njumpUpper = 5, 
+jumpTriParm <- function(x1,x2,x3, njumpLower = 1, njumpUpper = 5, 
                         jumpLower = -2, jumpUpper = 2,
                         jumpLoc1 = function(x,njump){ quantile(x, seq(0,1,length=njump+1)) },
                         jumpLoc2 = function(x,njump){ quantile(x, seq(0,1,length=njump+1)) },

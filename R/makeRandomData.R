@@ -1,5 +1,8 @@
 #' makeRandomData
 #' 
+#' Simulate a random data generating distribution. See Details to see how it's done. 
+#' 
+#' 
 #' Draw random data generating distribution. The code simulates as follows: \cr
 #' Simulate W \itemize{ 
 #' \item Choose \code{D}, a random number of covariates from Uniform(1,maxD)
@@ -79,18 +82,23 @@
 #' \item{fnG0}{A list of lists containing relevant information needed to reproduce data sets}
 #' \item{fnQ0}{A list of lists containing relevant information needed to reproduce data sets}
 #' \item{distErrY}{A list containing relevant information needed to reproduce data sets}
+#' \item{divideLogitG0}{A numeric of the scaling factor for the propensity}
 #' @export
 
 makeRandomData <- function(n, 
                            maxD,  
                            distW.uncor = c("uniformW","normalW","bernoulliW","binomialW","gammaW"), 
                            distW.cor = c("normalWCor","bernoulliWCor","uniformWCor"), 
-                           funcG0.uni = c("linUni","polyUni","sinUni","jumpUni"), 
-                           funcG0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv"), 
+                           funcG0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
+                                          "dNormUni","qGammaUni","dNormMixUni"), 
+                           funcG0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
+                                          "dNormAddBiv","dNormMultBiv"), 
                            funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"), 
-                           funcQ0.uni = c("linUni","polyUni","sinUni","jumpUni"), 
-                           funcQ0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv"), 
-                           funcQ0.tri = c("linBiv","polyBiv","sinBiv","jumpBiv"), 
+                           funcQ0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
+                                          "dNormUni","qGammaUni","dNormMixUni"), 
+                           funcQ0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
+                                          "dNormAddBiv","dNormMultBiv"), 
+                           funcQ0.tri = c("linTri","polyTri","sinTri","jumpTri"), 
                            errY = c("normalErr","uniformErr","gammaErr","normalErrW","uniformErrW"),
                            minG0 = 1e-2, 
                            ...){
@@ -102,26 +110,26 @@ makeRandomData <- function(n,
 	#----------------------------------------------------------------------
 	# initialize empties	
 	W <- matrix(nrow = n, ncol = D)
-	distW <- vector(mode = "list")
+	distW <- vector(mode = "list", length = D)
 	for(d in 1:D){
 		# randomly sample distribution
 		if(d==1){
 			# sample distribution
 			thisD <- sample(distW.uncor, 1)
 			# generate parameters
-			thisParm <- do.call(paste0(thisD,"Parm"))
+			thisParm <- do.call(paste0(thisD,"Parm"), args = list())
 			# generate covariate
 			W[,d] <- do.call(thisD, args = c(list(n=n), thisParm))
 		}else{
 			# sample distribution
 			thisD <- sample(c(distW.uncor,distW.cor), 1)
 			# generate parameters
-			thisParm <- do.call(paste0(thisD,"Parm"))
+			thisParm <- do.call(paste0(thisD,"Parm"), args = list())
 			# generate covariate
 			W[,d] <- do.call(thisD, args = c(list(n=n, x = W[,d-1]), thisParm))
 		}
 		# save distributions
-		distW$fn <- thisD; distW$parm <- thisParm
+		distW[[d]]$fn <- thisD; distW[[d]]$parm <- thisParm
 	}
 
 
@@ -131,11 +139,10 @@ makeRandomData <- function(n,
 	# draw random number of main terms
 	Mg1 <- round(runif(1, 0.5, D + 0.5))
 
-	# determine which covariates are continuous
-	contCov <- !grepl("rbinom",distVec)
-
-	# draw random number of interaction terms
+	# draw random number of two-way interaction terms
 	Mg2 <- ifelse(Mg1 > 1, round(runif(1, 0.5, Mg1 - 0.5)), 0)
+
+	# draw random number of three-way interaction terms
 	Mg3 <- ifelse(Mg2 > 1, round(runif(1, 0.5, Mg2 - 0.5)), 0)
 
 	# initialize empty
@@ -151,7 +158,7 @@ makeRandomData <- function(n,
 		# call function with parameters 
 		fOut <- do.call(thisF, args = c(list(x = W[,m]), thisParm))
 		# save output in list
-		uniG0[[m]]$fn <- thisF; uniG0[[m]]$parm <- thisParm
+		uniG0[[m]] <- list(fn = thisF, parm = thisParm)
 		# add to current logitg0
 		logitg0 <- logitg0 + fOut
 	}
@@ -166,7 +173,7 @@ makeRandomData <- function(n,
 		combCols <- sample(1:ncol(comb),Mg2)
 		for(m in 1:Mg2){
 			# the two columns used for this interaction
-			theseCols <- comb[,combCols]
+			theseCols <- comb[,combCols[m]]
 			# the random function to be used
 			thisF <- sample(funcG0.biv, 1)
 			# get parameters for function
@@ -174,13 +181,12 @@ makeRandomData <- function(n,
 			# call function with parameters
 			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]]),thisParm))
 			# save output in list
-			bivG0[[m]]$fn <- thisF; bivG0[[m]]$parm <- thisParm
-			bivG0[[m]]$whichColsW <- theseCols
+			bivG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
 			# add to current logitg0
 			logitg0 <- logitg0 + fOut
 		}
 	}else{
-		bivG0 <- list(NULL)
+		bivG0 <- NULL
 	}
 
 	#trivariate
@@ -193,7 +199,7 @@ makeRandomData <- function(n,
 		combCols <- sample(1:ncol(comb),Mg3)
 		for(m in 1:Mg3){
 			# the three columns used for this function
-			theseCols <- comb[,combCols]
+			theseCols <- comb[,combCols[m]]
 			# the random function to be used
 			thisF <- sample(funcG0.tri, 1)
 			# get parameters for function
@@ -201,18 +207,17 @@ makeRandomData <- function(n,
 			# call function with parameters
 			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]], x3=W[,theseCols[3]]),thisParm))
 			# save output in list
-			triG0[[m]]$fn <- thisF; triG0[[m]]$parm <- thisParm
-			triG0[[m]]$whichColsW <- theseCols 
+			triG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
 			# add to current logitg0
 			logitg0 <- logitg0 + fOut
 		}
 	}else{
-		triG0 <- list(NULL)
+		triG0 <- NULL
 	}
 
 	# correct for positivity violations
 	iter <- 0
-	while(min(plogis(logitg0)) < ming0){
+	while(min(plogis(logitg0)) < minG0){
 		iter <- iter + 1
 		logitg0 <- logitg0/1.01^iter
 	}
@@ -249,7 +254,7 @@ makeRandomData <- function(n,
 		# call function with parameters
 		fOut <- do.call(thisF, args = c(list(x = AW[,m]), thisParm))
 		# save results
-		uniQ0[[m]]$fn <- thisF; uniQ0[[m]]$parm <- thisParm
+		uniQ0[[m]] <- list(fn = thisF, parm = thisParm)
 		# add 
 		Q0 <- Q0 + fOut
 	}
@@ -263,7 +268,7 @@ makeRandomData <- function(n,
 		combCols <- sample(1:ncol(comb),MQ2)
 		for(m in 1:MQ2){
 			# what columns to use for this interaction
-			theseCols <- comb[,combCols]
+			theseCols <- comb[,combCols[m]]
 			# randomly sample function
 			thisF <- sample(funcQ0.biv,1)
 			# get parameters
@@ -271,13 +276,12 @@ makeRandomData <- function(n,
 			# call function with parameters 
 			fOut <- do.call(thisF, args = c(list(x1 = AW[,theseCols[1]], x2 = AW[,theseCols[2]]),thisParm))
 			# save output
-			bivQ0[[m]]$fn <- thisF; bivQ0[[m]]$parm <- thisParm
-			bivQ0[[m]]$whichColsAW <- theseCols 
+			bivQ0[[m]] <- list(fn = thisF, parm = thisParm, whichColsAW = theseCols)
 			# add
 			Q0 <- Q0 + fOut
 		}
 	}else{
-		bivQ0 <- list(NULL)
+		bivQ0 <- NULL
 	}
 
 	# three-way interactions 
@@ -290,7 +294,7 @@ makeRandomData <- function(n,
 		combCols <- sample(1:ncol(comb),MQ3)
 		for(m in 1:MQ3){
 			# columns to use for this interaction
-			theseCols <- comb[,combCols]
+			theseCols <- comb[,combCols[m]]
 			# randomly sample function
 			thisF <- sample(funcQ0.tri,1)
 			# get parameters 
@@ -298,31 +302,34 @@ makeRandomData <- function(n,
 			# call function with parameters
 			fOut <- do.call(thisF, args = c(list(x1 = AW[,theseCols[1]], x2 = AW[,theseCols[2]], x3=AW[,theseCols[3]]),thisParm))
 			# save output
-			triQ0[[m]]$fn <- thisF; triQ0[[m]]$parm <- thisParm
-			triQ0[[m]]$whichColsAW <- theseCols 
+			triQ0[[m]] <- list(fn = thisF, parm = thisParm, whichColsAW = theseCols)
 			# add
 			Q0 <- Q0 + fOut
 		}
 	}else{
-		triQ0 <- list(NULL)
+		triQ0 <- NULL
 	}
 
 
 	# Drawing an error function
 	# empty results
-	errY <- vector(mode = "list")
+	errYList <- vector(mode = "list")
 	# randomly draw error function
 	errFn <- sample(errY, 1)
 	# get parameters of error function
-	errParm <- do.call(paste0(errFn, "Parm"))
+	errParm <- do.call(paste0(errFn, "Parm"), args = list())
 	# evaluate error function
-	errOut <- do.call(errFn, args = c(list(W), errParm))
+	errOut <- do.call(errFn, args = c(list(W=W, n=n), errParm))
 	# save output
-	errY$fn <- errFn; errY$Parm <- errParm
+	errYList$fn <- errFn; errYList$parm <- errParm
 
 	# compute Y
 	Y <- Q0 + errOut
 
-	return(list(W = W, A = A, Y = Y, distW = distW, fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0),
-	            fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0), distErrY = errY))
+	out <- list(W = W, A = A, Y = Y, distW = distW, fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0),
+		            fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0), distErrY = errYList, divideLogitG0 = divideLogitG0,
+		            Q0 = Q0, g0 = plogis(logitg0), funcG0.uni = funcG0.uni, funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri,
+		            funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri)
+	class(out) <- "makeRandomData"
+	return(out)
 }

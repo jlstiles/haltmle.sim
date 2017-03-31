@@ -4,7 +4,7 @@
 \alias{normalErrWParm}
 \title{normalErrWParm}
 \usage{
-normalErrWParm(sdLower = 0.5, sdUpper = 3)
+normalErrWParm(sdLower = 0.5, sdUpper = 7)
 }
 \description{
 Generate parameters for \code{normalErrUniW}

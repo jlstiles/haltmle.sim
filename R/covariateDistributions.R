@@ -3,7 +3,7 @@
 #' 
 #' Draw from uniform(lower, upper) distribution
 #' @export
-uniformW <- function(n, lower, upper){
+uniformW <- function(n, lower, upper,...){
 	return(runif(n, lower, upper))
 }
 #' uniformWParm
@@ -22,7 +22,7 @@ uniformWParm <- function(lowerLower = -10, lowerUpper = 0,
 #' 
 #' Draw from Bernoulli(p)
 #' @export
-bernoulliW <- function(n,p){
+bernoulliW <- function(n,p,...){
 	return(rbinom(n,1,p))
 }
 #' bernoulliParm
@@ -37,7 +37,7 @@ bernoulliWParm <- function(pLower = 0.1, pUpper = 0.9){
 #' 
 #' Draw from binomial(num, p)
 #' @export
-binomialW <- function(n,num,p){
+binomialW <- function(n,num,p,...){
 	return(rbinom(n,num,p))
 }
 #' binomialWParm
@@ -53,7 +53,7 @@ binomialWParm <- function(pLower = 0.1, pUpper = 0.9,
 #' 
 #' Draw from normal(mean,sd)
 #' @export
-normalW <- function(n,mean,sd){
+normalW <- function(n,mean,sd,...){
 	return(rnorm(n,mean,sd))
 }
 #' normalWParm
@@ -70,7 +70,7 @@ normalWParm <- function(meanLower = -2, meanUpper = 2,
 #' 
 #' Draw from gamma(a,b) distribution
 #' @export
-gammaW <- function(n,a,b){
+gammaW <- function(n,a,b,...){
 	return(rgamma(n,a,b))
 }
 #' gammaWParm
@@ -87,7 +87,7 @@ gammaWParm <- function(aLower = 0.5, aUpper = 2.5,
 #' 
 #' Draw normal variate with mean x (to induce correlation)
 #' @export
-normalWCor <- function(n,x,sd){
+normalWCor <- function(n,x,sd,...){
 	return(rnorm(n,x,1))
 }
 #' normalWCorParm
@@ -102,7 +102,7 @@ normalWCorParm <- function(sdLower = 0.25, sdUpper = 2){
 #' 
 #' Draw bernoulli variable with prob x/r (to induce correlation)
 #' @export
-bernoulliWCor <- function(n,x,r){
+bernoulliWCor <- function(n,x,r,...){
 	return(rbinom(n,1,plogis(x/r)))
 }
 
@@ -111,22 +111,22 @@ bernoulliWCor <- function(n,x,r){
 #' Generate parameters for \code{bernoulliCorParm} (smaller r = more correlation)
 #' @export
 
-bernoulliWCorParm <- function(rLower = 0.1, rUpper = 10){
-	return(list(r = runif(rLower, rUpper)))
+bernoulliWCorParm <- function(rLower = 0.5, rUpper = 2){
+	return(list(r = runif(1, rLower, rUpper)))
 }
 
 #' uniformWCor
 #' 
 #' Draw variable that is x + uniform error (to induce correlation)
 #' @export
-uniformWCor <- function(n,x,lower,upper){
+uniformWCor <- function(n,x,lower,upper,...){
 	return(x + runif(n,lower,upper))
 }
 #' uniformWParm
 #' Generate parameters for \code{uniformParm} (smaller lower = more correlation)
 #' @export
 
-uniformWParm <- function(lowerLower = -2, lowerUpper = 0,
+uniformWCorParm <- function(lowerLower = -2, lowerUpper = 0,
                         rangeLower = 0.25, rangeUpper = 5){
 	lower <- runif(1, lowerLower, lowerUpper)
 	upper <- lower + runif(1, rangeLower, rangeUpper)

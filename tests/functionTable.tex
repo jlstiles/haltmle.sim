@@ -1,0 +1,183 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage[top=1in, left = 1in, right = 1in, bottom = 1in]{geometry}
+\usepackage{array,multirow,graphicx}
+\def\U{\mbox{U}}
+\def\DU{\mbox{DU}}
+\begin{document}
+A random data generating distribution is generated as follows. First, choose $D_{max}$, the maximum dimension of the covariate vector $W$, and $n$ the number of observations. Next simulate $W$ as follows: \begin{itemize}
+\item Randomly sample $D$, the number of covariates, from a Uniform(1,$D_{max}$) distribution. 
+\item Randomly sample ${\cal D}_1$, the distribution for first covariate, from the uncorrelated covariate distributions listed in the top half of Table \ref{covDist}. 
+\item Randomly select parameters for ${\cal D}_1$ from the corresponding distributions listed in the third column of Table \ref{covDist}. 
+\item Generate $W_1$ by sampling $n$ i.i.d. copies from ${\cal D}_1$ with the selected parameter values. 
+\item For $i = 2,\dots,D$ \begin{itemize}
+\item Choose ${\cal D}_i$, the distribution for the $i$-th covariate from the uncorrelated \emph{and} correlated covariate distributions in Table \ref{covDist}. 
+\item Randomly select parameters for ${\cal D}_i$ from the corresponding distributions listed in the third column Table \ref{covDist}. 
+\item Generate $W_i$ by sampling $n$ copies from ${\cal D}_i$ with the selected parameters and possibly inducing correlation with $W_{i-1}$ for distributions in bottom half of Table \ref{covDist}.
+\end{itemize}
+\end{itemize}
+
+\setbox0\hbox{Uncorr.}
+\setbox1\hbox{Corr.}
+\begin{table}
+\centering
+\begin{tabular}{|c|l|l|l|}
+\hline
+ 	& \texttt{R} function & Covariate distribution & $\theta$ distribution \\ \hline  
+\multirow{5}{*}{\rotatebox{90}{\rlap{\usebox0}}}
+	& \texttt{uniformW} & Uniform($a,a + r$) & $a \sim \mbox{U}(-10,0)$, $r \sim \mbox{U}(0.5, 10)$ \\
+	& \texttt{bernoulliW} & Bernoulli($p$) & $p \sim \U(0.1, 0.9)$ \\ 
+	& \texttt{binomialW} & Binomial($n,p$) & $n \sim \U(2,10)$, $p \sim \U(0.1, 0.9)$ \\
+	& \texttt{normalW} & Normal($\mu$,$\sigma^2$) & $\mu \sim \mbox{U}(-2,2)$, $\sigma \sim \mbox{U}(0.25, 2)$ \\
+	& \texttt{gammaW} & Gamma($a$,$b$) & $a \sim \U(0.5, 2.5), b \sim \U(0.5, 2.5)$ \\ 
+\hline
+\multirow{3}{*}{\rotatebox{90}{\rlap{\usebox1}}}
+	& \texttt{normalWCor} & Normal($w$, $\sigma^2$) & $\sigma \sim \mbox{U}(0.25, 2)$ \\
+	& \texttt{bernoulliWCor} & Bernoulli(expit($w$/r)) & $ r \sim \U(0.5, 2)$ \\
+	& \texttt{uniformWCor} & $w +$ Uniform($a,a+r$) & $a \sim \U(-2,0), r \sim \U(0.25, 5)$ \\
+	\hline
+\end{tabular}
+\caption{Possible distributions for covariates $W$}
+\label{covDist}
+\end{table}
+
+Next, simulate $A$ as follows: \begin{itemize}
+\item Draw $M_{1}^g$, the number of main terms for the propensity score, from Uniform(1,$D_{max}$). 
+\item For $i = 1, \dots, M_{1}^g$: \begin{itemize}
+	\item Randomly sample $f_{1,i}$ from the univariate functions in Table \ref{univariateFn}. 
+	\item Randomly sample $\theta_{1,i}$, the parameters for $f_{1,i}$, from the distributions listed in the third column of Table \ref{univariateFn}. 
+	\item Let $h_{1,i}(W) = f_i(W_i; \theta_{1,i})$
+\end{itemize}
+\item If $D>1$, sample $M_{2}^g$, the number of two-way interactions, from Uniform(1,$M_{1}^g - 1$).
+\item For $j = 1, \dots, M_{2}^g$: \begin{itemize}
+	\item Randomly sample $f_{2,j}$ from the bivariate functions in Table \ref{bivariateFn}. 
+	\item Randomly sample $\theta_{2,j}$, the parameters for $f_{2,i}$, from the distributions listed in the third column of Table \ref{bivariateFn}. 
+	\item Randomly sample two numbers without replacement from $\{1,\dots,D\}$. Call these numbers $a$, $b$.
+	\item Let $h_{2,j}(W) = f_{2,i}(W_a, W_b; \theta_{2,j})$
+\end{itemize}
+\item If $D > 2$, sample $M_3^g$, the number of three-way interactions, from Uniform(1,\texttt{$M_2^g$-1}).
+\item For $k = 1, \dots, M_{3}^g$: \begin{itemize}
+	\item Randomly sample $f_{3,k}$ from the trivariate functions in Table \ref{trivariateFn}. 
+	\item Randomly sample $\theta_{3,k}$, the parameters for $f_{3,k}$, from the distributions listed in the third column of Table \ref{trivariateFn}. 
+	\item Randomly sample three numbers without replacement, say $a$, $b$, and $c$, from $\{1,\dots,D\}$.
+	\item Let $h_{3,k}(W) = f_{2,i}(W_a, W_b, W_c; \theta_{3,k})$
+\end{itemize}
+\item Let $\mbox{logit}\{g_0(1 | W)\} = \sum_{i=1}^{M_1^g} h_i(W) + \sum_{j=1}^{M_2^g} h_j(W) + \sum_{k=1}^{M_3^g} h_k(W)$. 
+\item Draw $n$ independent copies of $A$ from a Bernoulli distribution with conditional probability that $A=1$ given by $g_0(1 | W)$. 
+\end{itemize}
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ \texttt{R} function & $f(w; \theta)$ & $\theta$ distribution \\ \hline  
+\texttt{linUni} & $cw$ & $c \sim \U(-2,2)$ \\
+\texttt{polyUni} & $\sum_{i=1}^{m} c_i w^{b_i} $ & $m \sim \DU(1,3), c_i \sim \U(-1,1), b_i \sim \DU(1,3)$ \\ 
+\texttt{sinUni} & $a \ \mbox{sin}(bw)$ & $a \sim \U(-1,1), b \sim \U(-1,1)$ \\
+\texttt{jumpUni} & $\sum_{i=1}^m a_i I(w \in (b_i, b_{i+1}])$ & $m \sim \DU(1,5), a_i \sim U(-2,2)$, \\ && $b_i = i/m$-th quantile $w$ \\
+\texttt{qGammaUni} & $c$ \texttt{qgamma}(expit($w$); $a,b$) & $a \sim \U(0.5, 5), b \sim \U(0.5, 5), c \sim \U(-2,2)$ \\ 
+\texttt{dNormUni} & $\frac{c}{2\pi \sigma}\mbox{exp}\{-(w-\mu)^2 / (2\sigma^2) \}$ & $c \sim \U(-4,4), \mu \sim \U(-5,5), \sigma \sim \U(0.25, 3)$ \\
+\texttt{pLogisUni} & $\frac{c}{1 + \mbox{exp}\{(aw - \mu)/\sigma\}}$ & $c \sim \U(-2,2), a \sim \U(-2,2), \mu \sim \U(-2,2),$ \\
+& & $\sigma \sim \U(0.25, 2)$ \\
+\texttt{dNormMixUni} & $\frac{c_1}{2\pi \sigma}\mbox{exp}\{-(w-\mu_1)^2 / (2\sigma_1^2) \} + $ & $c_1 \sim \U(-2,2), \mu_1 \sim \U(-5,5), \sigma_1 \sim \U(0.5,2)$\\
+					 & $  \frac{c_2}{2\pi \sigma}\mbox{exp}\{-(w-\mu_2)^2 / (2\sigma_2^2) \}$ & $c_2 \sim \U(-2,2), \mu_2 \sim \U(-5,5), \sigma_2 \sim \U(0.5,2)$ \\
+\hline
+\end{tabular}
+\caption{Possible univariate functions for main terms}
+\label{univariateFn}
+\end{table}
+
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ \texttt{R} function & $f(w_1, w_2; \theta)$ & $\theta$ distribution \\ \hline  
+\texttt{linBiv} & $cw_1w_2$ & $c \sim \U(-2,2)$ \\
+\texttt{polyBiv} & $c w_1^{b_{1}}w_2^{b_{2}} $ & $c \sim \U(-0.25,0.25), b_1 \sim \DU(1,3),$ \\ && $ b_2 \sim \DU(1,3)$ \\ 
+\texttt{sinBiv} & $a \ \mbox{sin}(bw_1 w_2)$ & $a \sim \U(-1,1), b \sim \U(-1,1)$ \\
+\texttt{jumpBiv} & $\sum_{i=1}^m \left\{ a_i I(w_1 \in (b_{1,i}, b_{1,i+1}]) \right.$ & $m \sim \DU(1,5), a_i \sim U(-2,2)$, 
+\\ & \hspace{1.4cm} $ \left. I(w_2 \in (b_{2,i}, b_{2,i+1}])\right\}$ & $b_{1,i} = i/m$-th quantile $w_1$,\\ && $b_{2,i} = i/m$-th quantile $w_2$  \\
+\texttt{dNormAddBiv} & $\frac{c}{2\pi \sigma}\mbox{exp}\{-(aw_1 + bw_2 -\mu)^2 / (2\sigma^2) \}$ & $c \sim \U(-5,5), a \sim \U(-1,1)$ \\
+& & $b \sim \U(-1,1), \mu \sim \U(-5,5),$ \\ & & $ \sigma \sim \U(0.25, 3)$ \\ 
+\texttt{dNormMultBiv} & $\frac{c}{2\pi \sigma}\mbox{exp}\{-(aw_1w_2 -\mu)^2 / (2\sigma^2) \}$ & $c \sim \U(-5,5), a \sim \U(-1,1)$ \\
+& & $\mu \sim \U(-5,5),\sigma \sim \U(0.25, 3)$ \\ 
+\texttt{pLogisUni} & $\frac{c}{1 + \mbox{exp}\{(a w_1 + bw_2 - \mu)/\sigma\}}$ & $c \sim \U(-4,4), a \sim \U(-1,1),$ \\ 
+& & $b \sim \U(-1,1), \mu \sim \U(-2,2),$ \\
+& & $\sigma \sim \U(0.25, 2)$ \\
+\hline
+\end{tabular}
+\caption{Possible bivariate functions for two-way interactions}
+\label{bivariateFn}
+\end{table}
+
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+ \texttt{R} function & $f(w_1, w_2, w_3; \theta)$ & $\theta$ distribution \\ \hline  
+\texttt{linBiv} & $cw_1w_2w_3$ & $c \sim \U(-2,2)$ \\
+\texttt{polyBiv} & $c w_1^{b_1} w_2^{b_2} w_3^{b_3} $ & $c \sim \U(-0.25,0.25), b_1 \sim \DU(1,3),$ \\ && $ b_2 \sim \DU(1,3), b_3 \sim \DU(1,3) $ \\ 
+\texttt{sinBiv} & $a \ \mbox{sin}(bw_1 w_2 w_3)$ & $a \sim \U(-1,1), b \sim \U(-1,1)$ \\
+\texttt{jumpBiv} & $\sum_{i=1}^m \left\{ a_i I(w_1 \in (b_{1,i}, b_{1,i+1}]) \right.$ & $m \sim \DU(1,5), a_i \sim U(-2,2)$, 
+\\ & \hspace{1.4cm} $ \left. I(w_2 \in (b_{2,i}, b_{2,i+1}])\right.$ & $b_{1,i} = i/m$-th quantile $w_1$,  \\
+& \hspace{1.5cm} $ \left. I(w_3 \in (b_{3,m-i}, b_{3,m-i+1}]) \right\}$ &  $b_{2,i} = i/m$-th quantile $w_2$ \\ & & $b_{3,i} = i/m$-th quantile $w_3$ \\
+\hline
+\end{tabular}
+\caption{Possible trivariate functions for three-way interactions}
+\label{trivariateFn}
+\end{table}
+
+Finally, simulate $Y$ as follows: \begin{itemize}
+\item Draw $M_1^Q$, a random number of main terms for outcome regression, from Uniform(2,$D_{max}$)
+\item Randomly sample a function $f_{A}$ from the univariate functions listed in Table \ref{univariateFn}. 
+\item Randomly sample $\theta_{A}$, the parameters for $f_{A}$, from the distributions listed in the third column of Table \ref{univariateFn}. 
+\item Let $h_{A}(A) = f_A(A; \theta_A)$
+\item For $i = 1, \dots, M_{1}^Q - 1$ \begin{itemize}
+	\item Randomly sample a function $f_{1,i}$ from the univariate functions listed in Table \ref{univariateFn}. 
+	\item Randomly sample $\theta_{1,i}$, the parameters for $f_{1,i}$ from the distributions listed in the third column of Table \ref{univariateFn}. 
+	\item Let $h_{1,i}(W) = f_i(W_i; \theta_{1,i})$
+\end{itemize}
+\item If $D>1$, sample $M_{2}^Q$, the number of two-way interactions from Uniform(1,$M_{1}^Q - 1$). 
+\item For $j = 1, \dots, M_{2}^Q$ \begin{itemize}
+	\item Randomly sample a function $f_{2,j}$ from the bivariate functions listed in Table \ref{bivariateFn}. 
+	\item Randomly sample $\theta_{2,j}$, the parameters for $f_{2,i}$ from the distributions listed in the third column of Table \ref{bivariateFn}. 
+	\item Randomly sample two numbers without replacement, say $a$, $b$, from $\{1,\dots,D\}$.
+	\item Let $h_{2,j}(W) = f_{2,i}(W_a, W_b; \theta_{2,j})$
+\end{itemize}
+\item If $D > 2$, sample $M_3^Q$, the number of three-way interactions from Uniform(1,\texttt{$M_2^Q$-1}). 
+\item For $k = 1, \dots, M_{3}^Q$ \begin{itemize}
+	\item Randomly sample a function $f_{3,k}$ from the possible trivariate functions listed in Table \ref{trivariateFn}. 
+	\item Randomly sample $\theta_{3,k}$, the parameters for $f_{3,k}$ from the distributions listed in the third column of Table \ref{trivariateFn}. 
+	\item Randomly sample three numbers without replacement, say $a$, $b$, and $c$, from $\{1,\dots,D\}$.
+	\item Let $h_{3,k}(W) = f_{2,i}(W_a, W_b, W_c; \theta_{3,k})$
+\end{itemize}
+\item Let $\bar{Q}_0(A,W) = h_A(A) + \sum_{i=1}^{M_1^g-1} h_i(W) + \sum_{j=1}^{M_2^g} h_j(W) + \sum_{k=1}^{M_3^g} h_k(W)$. 
+\item Randomly sample $\cal{E}$, a distribution for errors, from the possible distributions listed in Table \ref{errDist}. 
+\item Randomly sample $\theta_{\cal{E}}$, the parameters for $\cal{E}$ from the distributions listed in Table \ref{errDist}. 
+\item Generate $\epsilon$, by drawing $n$ independent errors from ${\cal E}(W; \theta_{\cal{E}})$, possibly inducing correlation between $\epsilon$ and $W$ (as in the distributions in the bottom of Table \ref{errDist}). 
+\item Let $Y_i = \bar{Q}_0(A_i,W_i) + \epsilon_i$ for $i=1,\dots,n$.  
+\end{itemize}
+
+\begin{table}
+\centering
+\begin{tabular}{|c|l|l|l|}
+\hline
+ 	& \texttt{R} function & Error distribution & $\theta$ distribution \\ \hline  
+\multirow{3}{*}{\rotatebox{90}{\rlap{\usebox0}}}
+	& \texttt{normalErr} & Normal($0, \sigma^2$) & $\sigma \sim \mbox{U}(0.5, 7)$  \\
+	& \texttt{uniformErr} & Uniform($-r/2, r/2$) & $r \sim \mbox{U}(1, 25)$  \\
+	& \texttt{gammaErr} & ShiftedGamma($a,b$) & $a \sim \mbox{U}(0.5, 7.5)$ \\ & & & $b \sim \U(0.5, 7.5)$  \\
+\multirow{4}{*}{\rotatebox{90}{\rlap{\usebox0}}}
+	& \texttt{normalErrW} (binary $W_1$) & Normal($0, \sigma^2\{1 + I(w_1 = 1)\}$) & $\sigma \sim \mbox{U}(0.5, 7)$  \\
+	& \texttt{normalErrW} (cont. $W_1$) & Normal($0, (\mbox{expit}(w_1)\sigma)^2$) & $\sigma \sim \mbox{U}(0.5, 7)$  \\
+	& \texttt{uniformErrW} (binary $W_1$) & Uniform($-r - I(w_1 = 1), r + I(w_1 = 1)$) & $r \sim \mbox{U}(1, 25)$  \\
+	& \texttt{uniformErrW} (cont. $W_1$) & Uniform($-r\mbox{expit}(w_1), r\mbox{expit}(w_1)$) & $\sigma \sim \mbox{U}(0.5, 7)$  \\
+	\hline
+\end{tabular}
+\caption{Possible error distributions. ShiftedGamma denotes a Gamma distribution shifted to have mean zero.}
+\label{errDist}
+\end{table}
+
+\end{document}

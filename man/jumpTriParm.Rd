@@ -4,7 +4,7 @@
 \alias{jumpTriParm}
 \title{jumpTriParm}
 \usage{
-jumpTriParm(x, njumpLower = 1, njumpUpper = 5, jumpLower = -2,
+jumpTriParm(x1, x2, x3, njumpLower = 1, njumpUpper = 5, jumpLower = -2,
   jumpUpper = 2, jumpLoc1 = function(x, njump) {     quantile(x, seq(0, 1,
   length = njump + 1)) }, jumpLoc2 = function(x, njump) {     quantile(x,
   seq(0, 1, length = njump + 1)) }, jumpLoc3 = function(x, njump) {    

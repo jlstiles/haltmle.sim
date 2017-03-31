@@ -122,3 +122,113 @@ jumpUniParm <- function(x, njumpLower = 1, njumpUpper = 5, jumpLower = -2, jumpU
 	   njump = njump, jumpLoc = jumpL, jumpVal = jumps
 	))
 }
+
+#' qGammaUni
+#' 
+#' Simulate a gamma cdf relationship with expit(x)
+#' @param x A vector
+#' @param coef The coefficient in front of the gamma cdf
+#' @param a The shape parameter
+#' @param b The rate parameter
+#' @export
+qGammaUni <- function(x, coef, a, b, ...){
+	return(coef*qgamma(plogis(x), a, b))
+}
+
+#' qGammaUniParm
+#' 
+#' Generate parameters for \code{qGammaUni}. 
+qGammaUniParm <- function(coefLower = -2, coefUpper = 2, aLower = 0.5, aUpper = 5, 
+                          bLower = 0.5, bUpper = 5,...){
+	coef <- runif(1, coefLower, coefUpper)
+	a <- runif(1, aLower, aUpper)
+	b <- runif(1, bLower, bUpper)
+	return(list(coef = coef, a = a, b = b))
+}
+
+#' dNormUni
+#' 
+#' Simulate a normal pdf relationship with x
+#' @param x A vector
+#' @param coef The coefficient in front of the normal pdf
+#' @param mu The mean of the normal pdf
+#' @param sig The sd of the normal pdf
+#' 
+#' @export
+dNormUni <- function(x, coef, mu, sig){
+	return(coef*dnorm(x, mu, sig))
+}
+
+#' dNormUniParm
+#' 
+#' Generate parameters for \code{dNormUni}
+#' @export
+dNormUniParm <- function(...,coefLower = -4, coefUpper = 4, 
+                         muLower=-5, muUpper=5, sigLower=0.25, sigUpper=3){
+	coef <- runif(1, coefLower, coefUpper)
+	mu <- runif(1, muLower, muUpper)
+	sig <- runif(1, sigLower, sigUpper)
+	return(list(coef = coef, mu = mu, sig = sig))
+}
+
+#' pLogisUni 
+#' 
+#' Simulate an expit relationship with x
+#' @param x A vector
+#' @param coef The coefficient in front of the normal pdf
+#' @param mult The multiplier inside the expit function
+#' @export
+pLogisUni <- function(x, coef, mult, loc, scale){
+	return(coef*plogis(x*mult, loc, scale))
+}
+
+#' pLogisUniParm
+#' 
+#' Parameters for \code{pLogisUni}
+#' @export
+#' 
+pLogisUniParm <- function(...,coefLower=-2, coefUpper=2, multLower=-2, multUpper=2,
+                          locLower = -2, locUpper = 2, scaleLower = 0.25, scaleUpper = 2){
+	coef <- runif(1, coefLower, coefUpper)
+	mult <- runif(1, multLower, multUpper)
+    loc <- runif(1, locLower, locUpper)
+    scale <- runif(1, scaleLower, scaleUpper)
+	return(list(coef = coef, mult = mult, loc = loc, scale = scale))
+}
+
+#' dNormMixUni 
+#' 
+#' Simulate a mixture of normal pdfs relationship with x
+#' @param x A vector
+#' @param coef1 Multiplier in front of first pdf
+#' @param coef2 Multiplier in front of second pdf
+#' @param mu1 Mean of first pdf
+#' @param mu2 Mean of second pdf
+#' @param sig1 SD of first pdf
+#' @param sig2 SD of second pdf
+#' @export
+dNormMixUni <- function(x, coef1, coef2, mu1, mu2, sig1, sig2){
+	return(coef1*dnorm(x, mu1, sig1) + coef2*dnorm(x, mu2, sig2))
+}
+
+#' dNormMixUniParm
+#' 
+#' Generate parameters for \code{dNormMixUni}
+#' @export
+dNormMixUniParm <- function(...,coef1Lower = -2, coef1Upper = 2, 
+                            coef2Lower = -2, coef2Upper = 2, 
+                            mu1Lower = -5, mu1Upper = 5,
+                            mu2Lower = -5, mu2Upper = 5,
+                            sig1Lower = 0.5, sig1Upper = 2,
+                            sig2Lower = 0.5, sig2Upper = 2
+                            ){
+	return(
+       list(coef1 = runif(1, coef1Lower, coef1Upper),
+            coef2 = runif(1, coef2Lower, coef2Upper),
+            mu1 = runif(1, mu1Lower, mu1Upper),
+            mu2 = runif(1, mu2Lower, mu2Upper),
+			sig1 = runif(1,sig1Lower,sig1Upper),
+           	sig2 = runif(1,sig2Lower,sig2Upper)
+            )
+   )
+}

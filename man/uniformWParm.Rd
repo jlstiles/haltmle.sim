@@ -4,16 +4,10 @@
 \alias{uniformWParm}
 \title{uniformWParm}
 \usage{
-uniformWParm(lowerLower = -2, lowerUpper = 0, rangeLower = 0.25,
-  rangeUpper = 5)
-
-uniformWParm(lowerLower = -2, lowerUpper = 0, rangeLower = 0.25,
-  rangeUpper = 5)
+uniformWParm(lowerLower = -10, lowerUpper = 0, rangeLower = 0.5,
+  rangeUpper = 10)
 }
 \description{
 Generate parameters for \code{uniform}
-
-uniformWParm
-Generate parameters for \code{uniformParm} (smaller lower = more correlation)
 }
 
