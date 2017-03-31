@@ -326,7 +326,7 @@ makeRandomData <- function(n,
 	# compute Y
 	Y <- Q0 + errOut
 
-	out <- list(W = W, A = A, Y = Y, distW = distW, fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0),
+	out <- list(W = W, A = data.frame(A=A), Y = data.frame(Y=Y), distW = distW, fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0),
 		            fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0), distErrY = errYList, divideLogitG0 = divideLogitG0,
 		            Q0 = Q0, g0 = plogis(logitg0), funcG0.uni = funcG0.uni, funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri,
 		            funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri)
