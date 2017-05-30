@@ -102,7 +102,7 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	varEffIC <- var(effIC)
 
 	# covariate correlations
-	corMatW <- cor(bigSet$W)
+	corMatW <- cor(bigObs$W)
 	corrW <- as.vector(corMatW)[as.vector(lower.tri(corMatW))]
 	nCorr1 <- sum(corrW < 0.1)
 	nCorr2 <- sum(corrW >= 0.1 & corrW < 0.4)
@@ -110,7 +110,7 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	nCorr4 <- sum(corrW > 0.6)
 
 	# error distribution
-	corErr <- cor(cbind(bigSet$err,bigSet$W))[,1]
+	corErr <- cor(cbind(bigObs$err,bigObs$W))[,1]
 	nCorr1 <- sum(corrW < 0.1)
 	nCorr2 <- sum(corrW >= 0.1 & corrW < 0.4)
 	nCorr3 <- sum(corrW >= 0.4 & corrW < 0.6)
@@ -123,7 +123,7 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	# of W, in which case we will want to add more correlation measures 
 	# between W and errors.
 	# Also, may want to consider bptest in lmtest package?
-	corSqErrW <- cor(bigSet$err^2,bigSet$W[,1])
+	corSqErrW <- cor(bigObs$err^2,bigObs$W[,1])
 
 	out <- list(
      n = length(object$A), sumA1 = sum(object$A==1), D = D, minObsG0 = minObsG0,
