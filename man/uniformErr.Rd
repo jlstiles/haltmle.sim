@@ -9,4 +9,3 @@ uniformErr(n, range, ...)
 \description{
 Draw an error from a uniform distribution with particular range
 }
-

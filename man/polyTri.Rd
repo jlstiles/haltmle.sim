@@ -33,4 +33,3 @@ Trivariate polynomial (see source code for details)
 polyTri
 Simulate a polynomial trivariate relationship
 }
-

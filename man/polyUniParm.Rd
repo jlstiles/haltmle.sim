@@ -12,4 +12,3 @@ Draw random coefficient for polynomial relationship univariate relationship.
 See source code for distributions. 
  @export
 }
-

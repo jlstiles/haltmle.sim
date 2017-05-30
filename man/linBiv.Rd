@@ -19,4 +19,3 @@ linBiv(x1, x2, coef)
 \description{
 Simulate a bivariate univariate relationship
 }
-

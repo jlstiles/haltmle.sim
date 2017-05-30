@@ -24,4 +24,3 @@ dNormAddBiv(x1, x2, coef, mult1, mult2, mu, sig)
 \description{
 Simulate a normal pdf relationship with two-way interaction
 }
-

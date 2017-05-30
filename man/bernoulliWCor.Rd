@@ -9,4 +9,3 @@ bernoulliWCor(n, x, r, ...)
 \description{
 Draw bernoulli variable with prob x/r (to induce correlation)
 }
-

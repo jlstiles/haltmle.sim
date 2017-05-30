@@ -49,4 +49,3 @@ An object of class \code{"makeRandomData"} with the following entries
 Given an object output by \code{makeRandomData}, make another data set with the same
 distribution.
 }
-

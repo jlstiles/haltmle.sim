@@ -17,4 +17,3 @@ linUni(x, coef)
 \description{
 Simulate a linear univariate relationship
 }
-

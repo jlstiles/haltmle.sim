@@ -12,4 +12,3 @@ dNormMixUniParm(..., coef1Lower = -2, coef1Upper = 2, coef2Lower = -2,
 \description{
 Generate parameters for \code{dNormMixUni}
 }
-

@@ -9,4 +9,3 @@ normalWCorParm(sdLower = 0.25, sdUpper = 2)
 \description{
 Generate parameters for \code{normalCor} (smaller SD = more correlation)
 }
-

@@ -23,4 +23,3 @@ polyUni(x, npoly, coef, deg)
 \description{
 Simulate a polynomial univariate relationship
 }
-

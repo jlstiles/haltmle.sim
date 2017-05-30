@@ -29,4 +29,3 @@ The value of the jump function.
 \description{
 Simulate a jump function trivariate relationship
 }
-

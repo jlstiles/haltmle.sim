@@ -115,4 +115,3 @@ Simulating Y \itemize{
 \item Let \code{Y = Q0 + e}. 
 }
 }
-

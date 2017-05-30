@@ -23,4 +23,3 @@ sinTri(x1, x2, x3, p, amp)
 \description{
 Simulate a sinusoidal trivariate relationship
 }
-

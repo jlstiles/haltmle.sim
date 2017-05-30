@@ -9,4 +9,3 @@ bernoulliWParm(pLower = 0.1, pUpper = 0.9)
 \description{
 Generate parameters for \code{bernoulli}
 }
-

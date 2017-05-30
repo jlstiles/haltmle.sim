@@ -9,4 +9,3 @@ binomialW(n, num, p, ...)
 \description{
 Draw from binomial(num, p)
 }
-

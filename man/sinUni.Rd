@@ -20,4 +20,3 @@ sinUni(x, p, amp)
 \description{
 Simulate a sinusoidal univariate relationship
 }
-

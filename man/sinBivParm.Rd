@@ -9,4 +9,3 @@ sinBivParm(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, ...)
 \description{
 Generate parameters for \code{sinBiv}
 }
-

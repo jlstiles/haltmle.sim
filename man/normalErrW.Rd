@@ -9,4 +9,3 @@ normalErrW(n, sd, W)
 \description{
 Draw an error from a normal distribution with a particular variance that depends on one W
 }
-

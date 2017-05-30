@@ -11,4 +11,3 @@ pLogisUniParm(..., coefLower = -2, coefUpper = 2, multLower = -2,
 \description{
 Parameters for \code{pLogisUni}
 }
-

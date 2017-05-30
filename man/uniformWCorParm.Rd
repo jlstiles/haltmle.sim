@@ -12,4 +12,3 @@ uniformWCorParm(lowerLower = -2, lowerUpper = 0, rangeLower = 0.25,
 uniformWParm
 Generate parameters for \code{uniformParm} (smaller lower = more correlation)
 }
-

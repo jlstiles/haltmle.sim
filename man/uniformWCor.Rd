@@ -9,4 +9,3 @@ uniformWCor(n, x, lower, upper, ...)
 \description{
 Draw variable that is x + uniform error (to induce correlation)
 }
-

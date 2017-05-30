@@ -9,4 +9,3 @@ gammaErr(n, a, b, ...)
 \description{
 Draw an error from a shifted gamma distribution with particular range
 }
-

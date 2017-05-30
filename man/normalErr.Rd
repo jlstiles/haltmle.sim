@@ -9,4 +9,3 @@ normalErr(n, sd, ...)
 \description{
 Draw an error from a normal distribution with particular variance
 }
-

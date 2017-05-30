@@ -29,4 +29,3 @@ polyBiv(x1, x2, npoly, coef, deg1, deg2)
 polyBiv
 Simulate a polynomial bivariate relationship
 }
-

@@ -21,4 +21,3 @@ linTri(x1, x2, x3, coef)
 \description{
 Simulate a trivariate univariate relationship
 }
-

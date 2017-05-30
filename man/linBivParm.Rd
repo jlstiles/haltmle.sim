@@ -9,4 +9,3 @@ linBivParm(coefLower = -2, coefUpper = 2, ...)
 \description{
 Generate coefficient for \code{linBiv}
 }
-

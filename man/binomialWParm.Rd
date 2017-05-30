@@ -9,4 +9,3 @@ binomialWParm(pLower = 0.1, pUpper = 0.9, numLower = 2, numUpper = 10)
 \description{
 Generate parameters for \code{binomial}
 }
-

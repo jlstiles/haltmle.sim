@@ -10,4 +10,3 @@ qGammaUniParm(coefLower = -2, coefUpper = 2, aLower = 0.5, aUpper = 5,
 \description{
 Generate parameters for \code{qGammaUni}.
 }
-

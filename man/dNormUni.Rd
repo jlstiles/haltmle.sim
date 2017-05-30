@@ -18,4 +18,3 @@ dNormUni(x, coef, mu, sig)
 \description{
 Simulate a normal pdf relationship with x
 }
-

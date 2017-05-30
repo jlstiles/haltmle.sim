@@ -9,4 +9,3 @@ linUniParm(coefLower = -2, coefUpper = 2, ...)
 \description{
 Draw random coefficient for linear univariate relationship
 }
-

@@ -9,4 +9,3 @@ bernoulliW(n, p, ...)
 \description{
 Draw from Bernoulli(p)
 }
-

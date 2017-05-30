@@ -11,4 +11,3 @@ gammaErrParm(aLower = 0.1, aUpper = 7.5, bLower = 0.1, bUpper = 7.5)
 gammaErrParm
 Generate parameters for \code{gammaErr}
 }
-

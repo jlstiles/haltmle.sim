@@ -9,4 +9,3 @@
 \description{
 A method to summarize output of makeRandomData
 }
-

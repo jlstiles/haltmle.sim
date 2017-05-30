@@ -20,4 +20,3 @@ dNormMultBiv(x1, x2, coef, mult, mu, sig)
 \description{
 Simulate a normal pdf relationship with two-way interaction
 }
-

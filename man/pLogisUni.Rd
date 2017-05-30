@@ -16,4 +16,3 @@ pLogisUni(x, coef, mult, loc, scale)
 \description{
 Simulate an expit relationship with x
 }
-

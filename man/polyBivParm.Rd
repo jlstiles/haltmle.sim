@@ -11,4 +11,3 @@ polyBivParm(npolyLower = 1, npolyUpper = 1, coefLower = -0.25,
 \description{
 Generate parameters for \code{polyBiv}.
 }
-

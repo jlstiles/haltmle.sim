@@ -9,4 +9,3 @@ linTriParm(coefLower = -2, coefUpper = 2, ...)
 \description{
 Generate parameters for \code{linTri}.
 }
-

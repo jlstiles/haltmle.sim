@@ -9,4 +9,3 @@ normalWCor(n, x, sd, ...)
 \description{
 Draw normal variate with mean x (to induce correlation)
 }
-

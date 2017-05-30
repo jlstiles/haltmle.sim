@@ -9,4 +9,3 @@
 \description{
 Plot the results of makeRandomData
 }
-

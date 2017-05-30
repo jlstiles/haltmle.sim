@@ -13,4 +13,3 @@ jumpTriParm(x1, x2, x3, njumpLower = 1, njumpUpper = 5, jumpLower = -2,
 \description{
 Generate parameters for \code{jumpTri}. See source code and \code{?jumpUni}.
 }
-

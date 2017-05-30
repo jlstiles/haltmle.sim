@@ -5,7 +5,7 @@
 #' 
 
 summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
-	n <- length(object$Y)
+	n <- length(object$Y[,1])
 	D <- dim(object$W)[2]
 	# minimum observed g_0(A | W)
 	minObsG0 <- min(object$g0)
@@ -85,19 +85,20 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	bigObs <- remakeRandomData(n = N, object = object)
 	# generate big setA data set
 	set.seed(seed)
-	bigSet <- remakeRandomData(n = N, object = object, setA = 1)
+	bigSet_1 <- remakeRandomData(n = N, object = object, setA = 1)
+	bigSet_0 <- remakeRandomData(n = N, object = object, setA = 0)
 
 	# r-squared for \bar{Q}_0(1,W)
-	r2 <- 1 - mean((bigSet$Y - bigSet$Q0)^2)/var(bigSet$Y)
-	# true mean in A = 1 group 
-	truth <- mean(bigSet$Y)
-
-	# marginal P(A = 1)
+	r2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
+	# true ATE
+	truth <- mean(bigSet_1$Y) - mean(bigSet_0$Y)
+	# marginal observed P(A = 1)
 	PA1 <- mean(bigObs$A)
-	# observed mean(Y)
-	obsMeanYA1 <- mean(bigObs$Y[bigObs$A==1])
+	# observed causal effect
+	obsATE <- mean(bigObs$Y[bigObs$A==1]) - mean(bigObs$Y[bigObs$A==0])
 	# variance of the eff ic
-	effIC <- as.numeric(bigObs$A == 1)/bigObs$g0 * (bigObs$Y - bigObs$Q0) + bigSet$Q0 - truth
+	effIC <- as.numeric(2*(bigObs$A == 1) - 1)/(bigObs$A*bigObs$g0 + (1-bigObs$A)*(1-bigObs$g0)) *
+								(bigObs$Y - bigObs$Q0) + (bigSet_1$Q0 - bigSet_0$Q0) - truth
 	varEffIC <- var(effIC)
 
 	# covariate correlations
@@ -116,10 +117,13 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	nCorr4 <- sum(corrW > 0.6)
 
 	# measure of error dependence on W
-	# more generally might use bptest in lmtest package?
+	# by default package only includes error distributions that 
+	# are correlated with the first component of W; more generally, 
+	# we might later add functions allowed to depend on multiple components
+	# of W, in which case we will want to add more correlation measures 
+	# between W and errors.
+	# Also, may want to consider bptest in lmtest package?
 	corSqErrW <- cor(bigSet$err^2,bigSet$W[,1])
-
-	# add variance of the eff IC #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	out <- list(
      n = length(object$A), sumA1 = sum(object$A==1), D = D, minObsG0 = minObsG0,
@@ -129,7 +133,7 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
      fnQ0.table = list(allFunQ0.uni, allFunQ0.biv, allFunQ0.tri),
      numBinW = numBinW, numCatW = numCatW, numContW = numContW,
      numNoisyG0 = numNoisyG0, numNoisyQ0 = numNoisyQ0, 
-     PA1 = PA1, r2 = r2, truth = truth, varEffIC = varEffIC, obsMeanYA1 = obsMeanYA1,
+     PA1 = PA1, r2 = r2, truth = truth, varEffIC = varEffIC, obsATE = obsATE,
      nCorr1 = nCorr1, nCorr2 = nCorr2, nCorr3 = nCorr3, nCorr4 = nCorr4, 
      corSqErrW = corSqErrW, errDist = object$distErrY
   	)

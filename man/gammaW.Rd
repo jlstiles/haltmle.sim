@@ -9,4 +9,3 @@ gammaW(n, a, b, ...)
 \description{
 Draw from gamma(a,b) distribution
 }
-

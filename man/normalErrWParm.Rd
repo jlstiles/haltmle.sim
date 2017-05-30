@@ -9,4 +9,3 @@ normalErrWParm(sdLower = 0.5, sdUpper = 7)
 \description{
 Generate parameters for \code{normalErrUniW}
 }
-

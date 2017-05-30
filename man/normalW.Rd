@@ -9,4 +9,3 @@ normalW(n, mean, sd, ...)
 \description{
 Draw from normal(mean,sd)
 }
-

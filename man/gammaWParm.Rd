@@ -11,4 +11,3 @@ gammaWParm(aLower = 0.5, aUpper = 2.5, bLower = 0.5, bUpper = 2.5)
 gammaWParm
 Generate parameters for \code{gammaDist}
 }
-

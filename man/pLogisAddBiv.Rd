@@ -2,6 +2,7 @@
 % Please edit documentation in R/bivariateFunctions.R
 \name{pLogisAddBiv}
 \alias{pLogisAddBiv}
+\alias{pLogisAddBiv}
 \title{pLogisAddBiv}
 \usage{
 pLogisAddBiv(..., coefLower = -4, coefUpper = 4, mult1Lower = -1,
@@ -32,4 +33,3 @@ pLogisAddBiv
 
 Generate parameters for \code{pLogisAddBiv}
 }
-

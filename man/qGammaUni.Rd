@@ -18,4 +18,3 @@ qGammaUni(x, coef, a, b, ...)
 \description{
 Simulate a gamma cdf relationship with expit(x)
 }
-

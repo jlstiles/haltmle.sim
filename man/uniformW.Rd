@@ -9,4 +9,3 @@ uniformW(n, lower, upper, ...)
 \description{
 Draw from uniform(lower, upper) distribution
 }
-

@@ -10,4 +10,3 @@ uniformWParm(lowerLower = -10, lowerUpper = 0, rangeLower = 0.5,
 \description{
 Generate parameters for \code{uniform}
 }
-

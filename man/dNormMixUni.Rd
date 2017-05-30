@@ -24,4 +24,3 @@ dNormMixUni(x, coef1, coef2, mu1, mu2, sig1, sig2)
 \description{
 Simulate a mixture of normal pdfs relationship with x
 }
-

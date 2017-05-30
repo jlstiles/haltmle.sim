@@ -11,4 +11,3 @@ dNormMultBivParm(..., coefLower = -5, coefUpper = 5, multLower = -1,
 \description{
 Generate parameters for dNormMultBiv
 }
-

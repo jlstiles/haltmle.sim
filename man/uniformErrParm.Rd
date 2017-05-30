@@ -9,4 +9,3 @@ uniformErrParm(rangeLower = 1, rangeUpper = 25)
 \description{
 Generate parameters for \code{uniformErr}
 }
-

@@ -11,4 +11,3 @@ Draw random periodicity and amplitude for sinusoidal relationship univariate rel
 See source code for distributions. 
  @export
 }
-

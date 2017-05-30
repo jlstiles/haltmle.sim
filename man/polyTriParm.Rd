@@ -11,4 +11,3 @@ polyTriParm(npolyLower = 1, npolyUpper = 1, coefLower = -0.1,
 \description{
 Generate parameters for \code{polyTri}. See source code.
 }
-

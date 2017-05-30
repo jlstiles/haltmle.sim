@@ -12,4 +12,3 @@ jumpBivParm(x1, x2, njumpLower = 1, njumpUpper = 5, jumpLower = -2,
 \description{
 Generate parameters for \code{jumpBiv}. See source code to see what it does.
 }
-

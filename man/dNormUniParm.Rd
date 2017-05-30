@@ -10,4 +10,3 @@ dNormUniParm(..., coefLower = -4, coefUpper = 4, muLower = -5,
 \description{
 Generate parameters for \code{dNormUni}
 }
-

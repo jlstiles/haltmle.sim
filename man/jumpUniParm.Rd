@@ -13,4 +13,3 @@ Generate parameters for \code{jumpUni}. Here jumpLoc is a function that takes x 
 the locations of jumps. By contrast, when jumpLoc is fed into jumpUni, it is just a vector
 of numbers. See source code for how exactly it works.
 }
-

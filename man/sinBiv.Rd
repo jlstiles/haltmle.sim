@@ -21,4 +21,3 @@ sinBiv(x1, x2, amp, p)
 \description{
 Simulate a sinusoidal bivariate relationship
 }
-
