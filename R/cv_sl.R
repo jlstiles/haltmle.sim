@@ -234,7 +234,7 @@ get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds,
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
 	cv_learner_pred[idx,] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
-	cv_sl_pred <- rep(NA, length(Y))
+	cv_sl_pred <- rep(NA, length(A))
 	cv_sl_pred[idx] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
 
     return(list(cv_learner_pred = cv_learner_pred,
