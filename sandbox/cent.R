@@ -30,9 +30,8 @@ if(length(args) < 1){
   # install_github("benkeser/modifySL")
   # install_github("benkeser/drtmle")
   # # load packages
-  library(modifySL)
-  library(haltmle.sim)
-  library(drtmle)
+  library(haltmle.sim, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+  library(cvma)
 # })
 
 # for hc_tmle
@@ -102,29 +101,22 @@ if (args[1] == 'run') {
     
     algo <- c("SL.glm","SL.bayesglm", 
               "SL.earth",
-              "SL.stepAIC","SL.step",
-              "SL.step.forward", "SL.step.interaction",
-              "SL.gam", "SL.gbm.caret1", "SL.rf.caret1",
-              "SL.svmLinear.caret1",
-              "SL.nnet.caret1",
-              "SL.rpart.caret1", "SL.mean","SL.hal")
+              "SL.step.interaction",
+              "SL.gam", 
+              "SL.dbarts",
+              "SL.xgboost",
+              "SL.gbm.caret1",
+              "SL.rf.caret1",
+              "SL.rpart.caret1", 
+              "SL.mean",
+              "SL.hal9001")
         
     # fit super learner with all algorithms
     set.seed(parm$seed[i])
-    X <- data.frame(dat$A, dat$W)
-    fullSL <- SuperLearner(Y=dat$Y$Y,X=X,family=gaussian(), SL.library=algo,
-                                   verbose=TRUE,method="method.NNLS")
-    # modify SL to drop HAL
-    dropSL <- modifySL::modifySL(fit = fullSL, Y = dat$Y$Y, 
-                                 newLibrary = fullSL$libraryNames[-(length(algo))])
-
-    ## get inference
-    X1 <- X0 <- X
-    X1$A <- 1; X0$A <- 0
     
-    outFull <- hc.tmle(Y=dat$Y$Y,X=X,X0=X0,X1=X1,fm=fullSL,onlySL=FALSE,trt="A")
-    outDrop <- hc.tmle(Y=dat$Y$Y,X=X,X0=X0,X1=X1,fm=dropSL,onlySL=TRUE,trt="A")
-    out <- list(outFull, outDrop)
+    out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
+                        V = 5, learners = algo, remove_learner = "SL.hal9001")
+
     save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
     }
 }
