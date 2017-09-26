@@ -91,7 +91,7 @@ if (args[1] == 'run') {
               "SL.earth",
               "SL.step.interaction",
               "SL.gam", 
-              "SL.dbarts",
+              "SL.dbarts.mod",
               "SL.gbm.caretMod",
               "SL.rf.caretMod",
               "SL.rpart.caretMod", 
@@ -102,7 +102,7 @@ if (args[1] == 'run') {
     dat$W <- data.frame(dat$W)
     colnames(dat$W) <- paste0("W",1:ncol(dat$W))
     out <- haltmle.sim:::get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 3, learners = algo[7:9], remove_learner = NULL)
+                        V = 3, learners = algo[c(2:3)], remove_learner = NULL)
 
     save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
     }

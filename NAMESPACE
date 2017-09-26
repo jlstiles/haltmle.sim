@@ -2,6 +2,7 @@
 
 S3method(summary,makeRandomData)
 export(SL.caretMod)
+export(SL.dbarts.mod)
 export(SL.gamSpline.caretMod)
 export(SL.gbm.caretMod)
 export(SL.glmnet.caretMod)

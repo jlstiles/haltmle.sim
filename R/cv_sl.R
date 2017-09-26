@@ -503,7 +503,7 @@ trim_qlogis <- function(x, trim = 1e-5){
 
 #' @export
 get_all_ates <- function(Y, W, A, V = 5, learners, 
-                              remove_learner = NULL, 
+                              remove_learner = NULL, gtol = 1e-3, 
                       sl_control_Q = list(ensemble_fn = "ensemble_linear",
                                    optim_risk_fn = "optim_risk_sl_se",
                                    weight_fn = "weight_sl_convex",
@@ -521,6 +521,15 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
 	                              remove_learner = remove_learner, 
 	                              sl_control_Q = sl_control_Q,
 	                              sl_control_g = sl_control_g)
+  # truncate propensity estimates
+  nuisance$g <- lapply(nuisance$g, function(g){
+    tmp <- apply(g, 2, function(gn){ 
+      gn[gn < gtol] <- gtol
+      gn[gn > 1 - gtol] <- 1 - gtol
+      gn
+    })
+    data.frame(tmp)
+  })
 
 	# get logistic tmles
 	log_tmle <- mapply(Qbar = nuisance$Qbar, g = nuisance$g, logistic_tmle,

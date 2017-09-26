@@ -1,3 +1,70 @@
+#' @export
+#' 
+SL.dbarts.mod = function(Y, X, newX, family, obsWeights, id,
+                     sigest = NA,
+                     sigdf = 3,
+                     sigquant = 0.90,
+                     k = 2.0,
+                     power = 2.0,
+                     base = 0.95,
+                     binaryOffset = 0.0,
+                     ntree = 200,
+                     ndpost = 1000,
+                     nskip = 100,
+                     printevery = 100,
+                     keepevery = 1,
+                     keeptrainfits = T,
+                     usequants = F,
+                     numcut = 100,
+                     printcutoffs = 0,
+                     nthread = 1,
+                     keepcall = T,
+                     verbose = F,
+                     ...) {
+
+  SuperLearner:::.SL.require("dbarts")
+
+  model =
+    dbarts::bart(x.train = X,
+                 y.train = Y,
+                 # We need to pass newX in directly due to lack of prediction.
+                 x.test = newX,
+                 sigest = sigest,
+                 sigdf = sigdf,
+                 sigquant = sigquant,
+                 k = k,
+                 power = power,
+                 base = base,
+                 binaryOffset = binaryOffset,
+                 weights = obsWeights,
+                 ntree = ntree,
+                 ndpost = ndpost,
+                 nskip = nskip,
+                 printevery = printevery,
+                 keepevery = keepevery,
+                 keeptrainfits = keeptrainfits,
+                 usequants = usequants,
+                 numcut = numcut,
+                 printcutoffs = printcutoffs,
+                 nthread = nthread,
+                 keepcall = keepcall,
+                 verbose = verbose)
+
+  # TODO: there is no predict!
+  #pred = predict(model, newdata = newX)
+  if (family$family == "gaussian") {
+    pred = model$yhat.test.mean
+  } else {
+    # No mean is provided for binary Y :/
+    pred = colMeans(pnorm(model$yhat.test))
+  }
+
+  fit = list(object = model)
+  class(fit) = c("SL.dbarts")
+  out = list(pred = pred, fit = fit)
+  return(out)
+}
+
 #' SL.svmLinear.caretMod
 #' Uses SL.caretMod to train a linear svm with 15 choices of 
 #' tuning parameter
