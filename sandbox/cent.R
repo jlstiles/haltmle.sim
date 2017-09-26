@@ -31,14 +31,14 @@ if(length(args) < 1){
   # install_github("benkeser/drtmle")
   # # load packages
   library(haltmle.sim, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
-  library(cvma)
+  library(cvma, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
 # })
 
 # for hc_tmle
-source("~/hc/sim/healthcosts.R")
+# source("~/hc/sim/healthcosts.R")
 
 # parameters
-ns <- c(4000)
+ns <- c(200, 1000, 5000)
 bigB <- 1:10000
 
 # directories to save in 
@@ -99,23 +99,22 @@ if (args[1] == 'run') {
     library(SuperLearner)
     library(caret)
     
-    algo <- c("SL.glm","SL.bayesglm", 
+    algo <- c("SL.hal9001","SL.glm","SL.bayesglm", 
               "SL.earth",
               "SL.step.interaction",
               "SL.gam", 
               "SL.dbarts",
               "SL.xgboost",
-              "SL.gbm.caret1",
-              "SL.rf.caret1",
-              "SL.rpart.caret1", 
-              "SL.mean",
-              "SL.hal9001")
+              "SL.gbm.caretMod",
+              "SL.rf.caretMod",
+              "SL.rpart.caretMod", 
+              "SL.mean")
         
     # fit super learner with all algorithms
     set.seed(parm$seed[i])
     
     out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 5, learners = algo, remove_learner = "SL.hal9001")
+                        V = 3, learners = algo[1:3], remove_learner = "SL.hal9001")
 
     save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
     }

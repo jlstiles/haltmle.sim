@@ -291,10 +291,10 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
                             # weight_sl_control = weight_sl_control)
 
     cv_pred <- get_ate_cv_Q_pred(Y, V, all_fit_tasks, all_fits, all_sl, folds, 
-                             sl_control, learners = learners)
+                             sl_control_Q, learners = learners)
     # get predictions for non-CV TMLE
     pred <- Reduce(cbind, lapply(all_fits[1:length(learners)], "[[", "pred_setA"))
-    sl_pred <- do.call(sl_control$ensemble_fn, args = list(pred = pred, weight = 
+    sl_pred <- do.call(sl_control_Q$ensemble_fn, args = list(pred = pred, weight = 
                                                            all_sl[[1]]$sl_weight))
     # now try without a particular learner
     if(!is.null(remove_learner)){
@@ -309,7 +309,7 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 	    cv_pred_rm <- get_ate_cv_Q_pred(Y, V, all_fit_tasks, all_fits, all_sl_rm, folds, 
 	                             sl_control_Q, learners = learners, remove_index = remove_index)
 	    # predictions for sl with hal removed 
-	    sl_pred_rm <- do.call(sl_control$ensemble_fn, args = list(pred = pred[,-remove_index], weight = 
+	    sl_pred_rm <- do.call(sl_control_Q$ensemble_fn, args = list(pred = pred[,-remove_index], weight = 
                                                            all_sl_rm[[1]]$sl_weight))
 	}
 
@@ -498,6 +498,7 @@ trim_qlogis <- function(x, trim = 1e-5){
 	qlogis(x)
 }
 
+#' @export
 get_all_ates <- function(Y, W, A, V = 5, learners, 
                               remove_learner = NULL, 
                       sl_control_Q = list(ensemble_fn = "ensemble_linear",
