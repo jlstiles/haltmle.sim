@@ -83,6 +83,7 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
                              sl_control, return_learner_fits = TRUE,
                              learners, remove_index = NULL){
 	# 
+  n <- length(Y)
 	train_matrix <- combn(V, V-1)
 	all_out <- lapply(split(train_matrix,col(train_matrix)), function(tr){
 		learner_idx <- cvma:::search_fits_for_training_folds(fits = all_fit_tasks, 
@@ -206,7 +207,7 @@ get_ps_fit <- function(task, folds, W, A, sl_control){
 get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds, 
                              sl_control, return_learner_fits = TRUE,
                              learners, remove_index = NULL){
-	# 
+	n <- length(A)
 	train_matrix <- combn(V, V-1)
 	all_out <- lapply(split(train_matrix,col(train_matrix)), function(tr){
 		learner_idx <- cvma:::search_fits_for_training_folds(fits = all_fit_tasks, 
