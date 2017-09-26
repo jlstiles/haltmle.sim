@@ -42,7 +42,7 @@ SL.rpart.caretMod <- function(...,method="rpart",tuneLength = 10, trControl = ca
 #' @export
 
 SL.rf.caretMod <- function (..., method = "rf", tuneLength = 10, 
-                            trControl = caret::trainControl(method = "cv", number = 2)) 
+                            trControl = caret::trainControl(method = "cv", number = 5)) 
 {
     SL.caretMod(..., method = method, tuneLength = tuneLength, trControl = trControl)
 }
@@ -105,8 +105,8 @@ SL.glmnet.caretMod <- function(...,method="glmnet", tuneLength=10, trControl = c
 #' 
 #' @export
 
-SL.gbm.caretMod <- function (..., method = "gbm", tuneLength = 20, 
-                           trControl = caret::trainControl(method = "cv", number = 2)) 
+SL.gbm.caretMod <- function (..., method = "gbm", tuneLength = 5, 
+                           trControl = caret::trainControl(method = "cv", number = 5)) 
 {
     SL.caretMod(..., method = method, tuneLength = tuneLength, trControl = trControl)
 }
@@ -150,7 +150,7 @@ SL.gamSpline.caretMod <- function(...,method="gamSpline",tuneLength=10,
 #' @export
 
 SL.caretMod <- function (Y, X, newX, family, obsWeights, method, tuneLength = 10, 
-                       trControl = caret::trainControl(method = "cv", number = 2, verboseIter = FALSE), 
+                       trControl = caret::trainControl(method = "cv", number = 5, verboseIter = FALSE), 
                        ...) 
 {
   if (length(unique(Y))>2){

@@ -32,6 +32,7 @@ if(length(args) < 1){
   # # load packages
   library(haltmle.sim, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
   library(cvma, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+  library(hal9001, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
 # })
 
 # for hc_tmle
@@ -48,19 +49,6 @@ scratchDir <- "~/haltmle.sim/scratch/"
 # # simulation parameters
 parm <- expand.grid(seed=bigB,
                     n=ns)
-
-# get re-dos
-# allF <- list.files("~/haltmle_sim/out")
-# theseF <- allF[grep("outInf3", allF)]
-# ind <- rep(NA, nrow(parm))
-# for(i in 1:nrow(parm)){
-#   ind[i] <- paste0("outInf3_n=",parm$n[i],"_seed=",parm$seed[i],".RData") %in% theseF
-# }
-
-# parm <- parm[!ind,]
-
-# save(parm, file = "~/hc/sim/scratch/parm_remainSims.RData")
-# load("~/hc/sim/scratch/parm_remainSims.RData")
 
 # get the list size #########
 if (args[1] == 'listsize') {
@@ -104,7 +92,6 @@ if (args[1] == 'run') {
               "SL.step.interaction",
               "SL.gam", 
               "SL.dbarts",
-              "SL.xgboost",
               "SL.gbm.caretMod",
               "SL.rf.caretMod",
               "SL.rpart.caretMod", 
@@ -112,9 +99,10 @@ if (args[1] == 'run') {
         
     # fit super learner with all algorithms
     set.seed(parm$seed[i])
-    
-    out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 3, learners = algo[1:3], remove_learner = "SL.hal9001")
+    dat$W <- data.frame(dat$W)
+    colnames(dat$W) <- paste0("W",1:ncol(dat$W))
+    out <- haltmle.sim:::get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
+                        V = 3, learners = algo[7:9], remove_learner = NULL)
 
     save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
     }

@@ -5,7 +5,7 @@
 \title{SL.caretMod}
 \usage{
 SL.caretMod(Y, X, newX, family, obsWeights, method, tuneLength = 10,
-  trControl = caret::trainControl(method = "cv", number = 2, verboseIter =
+  trControl = caret::trainControl(method = "cv", number = 5, verboseIter =
   FALSE), ...)
 }
 \arguments{

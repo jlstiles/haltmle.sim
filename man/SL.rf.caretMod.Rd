@@ -5,7 +5,7 @@
 \title{SL.rf.caretMod}
 \usage{
 SL.rf.caretMod(..., method = "rf", tuneLength = 10,
-  trControl = caret::trainControl(method = "cv", number = 2))
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \arguments{
 \item{...}{Other arguments passed to \code{SL.caretMod}}

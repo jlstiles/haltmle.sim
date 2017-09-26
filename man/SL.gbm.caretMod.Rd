@@ -4,8 +4,8 @@
 \alias{SL.gbm.caretMod}
 \title{SL.gbm.caretMod}
 \usage{
-SL.gbm.caretMod(..., method = "gbm", tuneLength = 20,
-  trControl = caret::trainControl(method = "cv", number = 2))
+SL.gbm.caretMod(..., method = "gbm", tuneLength = 5,
+  trControl = caret::trainControl(method = "cv", number = 5))
 }
 \arguments{
 \item{...}{Other arguments passed to \code{SL.caretMod}}
