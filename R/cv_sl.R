@@ -456,7 +456,7 @@ linear_tmle <- function(Y, W, A, Qbar, g, gtol = 1e-2){
 	          data = fluc_dat_0, weights = HAW_0)
 
 	pred_A1_dat <- data.frame(out = as.numeric(Y),
-	                          off = Qba$Q1W)
+	                          off = Qbar$Q1W)
 	pred_A0_dat <- data.frame(out = as.numeric(Y),
 	                          off = Qbar$Q0W)
 	Q1W_star <- predict(fm_1, newdata = pred_A1_dat, type = "response")
