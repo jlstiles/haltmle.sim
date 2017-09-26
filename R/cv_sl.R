@@ -470,7 +470,7 @@ get_tmle_ate <- function(Qbar){
 	return(mean(Qbar$Q1W_star) - mean(Qbar$Q0W_star))
 }
 
-get_onestep_ate <- function(Qbar, gbar, Y, A, W){
+get_onestep_ate <- function(Qbar, g, Y, A, W){
 	HAW <- (2*A - 1)/ifelse(A==1, g$g1W, g$g0W)
 	naive_ate <- mean(Qbar$Q1W - Qbar$Q0W)
 	correction <- mean(HAW * (Y - Qbar$QAW))
