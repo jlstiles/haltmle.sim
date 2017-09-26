@@ -4,9 +4,9 @@
 \alias{pLogisUniParm}
 \title{pLogisUniParm}
 \usage{
-pLogisUniParm(..., coefLower = -2, coefUpper = 2, multLower = -2,
-  multUpper = 2, locLower = -2, locUpper = 2, scaleLower = 0.25,
-  scaleUpper = 2)
+pLogisUniParm(..., coefLower = -4, coefUpper = 4, multLower = -4,
+  multUpper = 4, locLower = -4, locUpper = 4, scaleLower = 0.25,
+  scaleUpper = 4)
 }
 \description{
 Parameters for \code{pLogisUni}

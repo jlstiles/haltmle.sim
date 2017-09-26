@@ -15,7 +15,6 @@ sinUni(x, p, amp)
 }
 \value{
 \code{amp*sin(p*x)}
- @export
 }
 \description{
 Simulate a sinusoidal univariate relationship

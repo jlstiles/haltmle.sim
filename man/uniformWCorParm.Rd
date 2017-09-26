@@ -5,8 +5,9 @@
 \title{uniformWParm
 Generate parameters for \code{uniformParm} (smaller lower = more correlation)}
 \usage{
-uniformWCorParm(lowerLower = -2, lowerUpper = 0, rangeLower = 0.25,
-  rangeUpper = 5)
+uniformWCorParm(W = NULL, lowerLower = -5, lowerUpper = 0.25,
+  rangeLower = 0.25, rangeUpper = 10, nCorrLower = 1,
+  nCorrUpper = ncol(W))
 }
 \description{
 uniformWParm

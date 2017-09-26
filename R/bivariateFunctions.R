@@ -16,10 +16,63 @@ linBiv <- function(x1,x2,coef){
 #' 
 #' Generate coefficient for \code{linBiv} 
 #' @export
-linBivParm <- function(coefLower = -2, coefUpper = 2,...){
-	linUniParm(...,coefLower = coefLower, coefUpper = coefUpper)
+linBivParm <- function(coefLower = -4, coefUpper = 4,x1,x2){
+	linUniParm(coefLower = coefLower, coefUpper = coefUpper)
 }
 
+
+#' linSplineBiv
+#' @export
+linSplineBiv <- function(x1, x2, nKnot, knotLoc, slopes){
+	y <- rep(0, length(x1))
+	kl <- c(min(x1*x2),knotLoc)
+	# make basis
+	for(k in 1:(nKnot+1)){
+		xb <- pmax(0, x1*x2 - kl[k])
+		y <- y + xb * slopes[k]
+	}
+	return(y)
+}
+
+#' linSplineBivParm
+#' @export
+linSplineBivParm <- function(x1,x2, slopeLower = -3, slopeUpper = 3, 
+                             nKnotLower = 1, nKnotUpper = 5,
+                             quantLower = 0.05, quantUpper = 0.95){
+	nKnot <- round(runif(1, nKnotLower - 0.5, nKnotUpper + 0.5))
+	slopes <- runif(nKnot + 1, slopeLower, slopeUpper)
+	knotLoc <- sort(quantile(x1*x2, p = runif(nKnot, quantLower, quantUpper)))
+	return(list(nKnot = nKnot, slopes = slopes, knotLoc = knotLoc))
+}
+
+
+
+#' linJumpBiv
+#' 
+#' Simulate a bivariate relationship with jump at random quantile of 
+#' one variable.
+#' 
+#' @param x1 A vector 
+#' @param x2 A vector
+#' @param coef A numeric (supplied by \code{linBivParm})
+#' @param jumpLoc Location of randomly chosen quantile
+#'
+#' @return \code{coef*x1*x2}
+#' @export
+linJumpBiv <- function(x1,x2,coef,jumpLoc){
+	return(coef*x1*as.numeric(x2 > jumpLoc))
+}
+#' linJumpBivParm
+#' 
+#' Generate coefficient for \code{linBiv} 
+#' @export
+linJumpBivParm <- function(coefLower = -4, coefUpper = 4,
+                           quantLower = 0.1, quantUpper = 0.9, x1,x2){
+	quant <- runif(1, quantLower, quantUpper)
+	jumpLoc <- quantile(x2, p = quant)
+	list(coef = runif(1, coefLower, coefUpper),
+	     jumpLoc = jumpLoc)
+}
 
 #' polyBiv
 #' Simulate a polynomial bivariate relationship
@@ -46,15 +99,53 @@ polyBiv <- function(x1,x2,npoly,coef,deg1,deg2){
 #' 
 #' Generate parameters for \code{polyBiv}.
 #' @export
-polyBivParm <- function(npolyLower = 1, npolyUpper = 1, 
+polyBivParm <- function(npolyLower = 1, npolyUpper = 2, 
                         coefLower = -0.25, coefUpper = 0.25, 
                         deg1Lower = 1, deg1Upper = 3, 
-                        deg2Lower = 1, deg2Upper = 3,...){
+                        deg2Lower = 1, deg2Upper = 3,x1,x2){
 	npoly <- round(runif(1,npolyLower - 0.5, npolyUpper + 0.5))
 	coef <- runif(npoly, coefLower, coefUpper)
 	deg1 <- round(runif(npoly, deg1Lower - 0.5, deg1Upper + 0.5))
 	deg2 <- round(runif(npoly, deg2Lower - 0.5, deg2Upper + 0.5))
 	return(list(npoly = npoly, coef = coef, deg1 = deg1, deg2 = deg2))
+}
+
+
+#' polyJumpBiv
+#' Simulate a polynomial bivariate relationship
+#' 
+#' @param x1 A vector
+#' @param x2 A vector 
+#' @param npoly A numeric indicating the number of polynomial terms to simulate
+#' @param coef A vector indicating the coefficient for each polynomial term
+#' @param deg1 A vector indicating the degree of the first polynomial term
+#' @param jumpLoc Location of randomly chosen quantile
+#' @param coef A numeric coefficient
+#'
+#' @return \code{coef[1]*x1^deg1[1]*x2^deg2[2] + ... + coef[npoly]*x1^deg1[npoly]*x2^deg2[2]}
+#' @export
+
+polyJumpBiv <- function(x1,x2,npoly,coef,deg1,jumpLoc){
+	tmp <- rep(0, length(x1))
+	for(i in 1:npoly){
+		tmp <- tmp + coef[i]*x1^deg1[i]*as.numeric(x2 > jumpLoc)
+	}
+	return(tmp)
+}
+#'polyJumpBivParm
+#' 
+#' Generate parameters for \code{polyBiv}.
+#' @export
+polyJumpBivParm <- function(npolyLower = 1, npolyUpper = 2, 
+                        coefLower = -0.25, coefUpper = 0.25, 
+                        deg1Lower = 1, deg1Upper = 3,
+                        quantLower = 0.1, quantUpper = 0.9,x1,x2){
+	npoly <- round(runif(1,npolyLower - 0.5, npolyUpper + 0.5))
+	coef <- runif(npoly, coefLower, coefUpper)
+	deg1 <- round(runif(npoly, deg1Lower - 0.5, deg1Upper + 0.5))
+	quant <- runif(1, quantLower, quantUpper)
+	jumpLoc <- quantile(x2, p = quant)
+	return(list(npoly = npoly, coef = coef, deg1 = deg1, jumpLoc = jumpLoc))
 }
 
 #' sinBiv
@@ -77,9 +168,40 @@ sinBiv <- function(x1,x2,amp,p){
 #' 
 #' Generate parameters for \code{sinBiv}
 #' @export
-sinBivParm <- function(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1,...){
-	sinUniParm(pLower = pLower, pUpper = pUpper, ampLower = ampLower, ampUpper = ampUpper, ...)
+sinBivParm <- function(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1,x1,x2){
+	sinUniParm(pLower = pLower, pUpper = pUpper, ampLower = ampLower, ampUpper = ampUpper)
 }
+
+#' sinJumpBiv
+#' 
+#' Simulate a sinusoidal bivariate relationship
+#' 
+#' @param x1 A vector 
+#' @param x2 A vector
+#' @param p The periodicity of the sin function
+#' @param amp The amplitude of the sin function
+#' @param jumpLoc Location of randomly chosen quantile
+#' @return \code{amp*sin(p*x)}
+#' @export
+sinJumpBiv <- function(x1,x2,amp,p,jumpLoc){
+	w <- amp*sin(p*x1*as.numeric(x2 > jumpLoc))
+	return(w)
+}
+
+#' sinJumpBivParm 
+#' 
+#' Generate parameters for \code{sinBiv}
+#' @export
+sinJumpBivParm <- function(pLower = -1, pUpper = 1, 
+                           ampLower = -1, ampUpper = 1,
+                           quantLower = 0.1, quantUpper = 0.9,x1,x2){
+	p <- runif(1, pLower, pUpper)
+	amp <- runif(1, ampLower, ampUpper)
+	quant <- runif(1, quantLower, quantUpper)
+	jumpLoc <- quantile(x2, p = quant)
+	return(list(p = p, amp = amp, jumpLoc = jumpLoc))
+}
+
 
 
 #' jumpBiv
@@ -148,7 +270,7 @@ dNormAddBiv <- function(x1,x2, coef, mult1, mult2, mu, sig){
 #' 
 #' Generate parameters for dNormAddBiv
 #' @export
-dNormAddBivParm <- function(...,coefLower=-5, coefUpper=5, mult1Lower=-1, mult1Upper=1, mult2Lower=-1, mult2Upper=1,
+dNormAddBivParm <- function(x1,x2,coefLower=-5, coefUpper=5, mult1Lower=-1, mult1Upper=1, mult2Lower=-1, mult2Upper=1,
                             muLower = -2, muUpper = 2, sigLower = 0.5, sigUpper = 2){
 	return(list(
        coef = runif(1, coefLower, coefUpper),
@@ -178,13 +300,47 @@ dNormMultBiv <- function(x1,x2, coef, mult, mu, sig){
 #' 
 #' Generate parameters for dNormMultBiv
 #' @export
-dNormMultBivParm <- function(...,coefLower=-5, coefUpper=5, multLower=-1, multUpper=1,
+dNormMultBivParm <- function(x1,x2,coefLower=-5, coefUpper=5, multLower=-1, multUpper=1,
                              muLower = -2, muUpper = 2, sigLower = 0.5, sigUpper = 2){
 	return(list(
        coef = runif(1, coefLower, coefUpper),
        mult = runif(1, multLower, multUpper),
        mu = runif(1, muLower, muUpper),
        sig = runif(1, sigLower, sigUpper)    
+    ))
+}
+
+#' dNormMultJumpBiv
+#' 
+#' Simulate a normal pdf relationship with two-way interaction
+#' 
+#' @param x1 A vector
+#' @param x2 A vector
+#' @param coef Multiplier in front of dnorm
+#' @param mult Multiplier 1 inside dnorm
+#' @param jumpLoc2 Location of random quantile jump
+#' @export
+
+dNormMultJumpBiv <- function(x1,x2, coef, mult, jumpLoc2, mu, sig){
+	return(coef*dnorm(mult*(x1*as.numeric(x2 > jumpLoc2)), mu, sig))
+}
+
+#' dNormMultJumpBivParm
+#' 
+#' Generate parameters for dNormMultBiv
+#' @export
+dNormMultJumpBivParm <- function(x1,x2,coefLower=-5, coefUpper=5, multLower=-1, multUpper=1,
+                             muLower = -2, muUpper = 2, sigLower = 0.5, sigUpper = 2,
+                             quantLower = 0.1, quantUpper = 0.9){
+    quant = runif(1, quantLower, quantUpper) 
+	jl2 <- quantile(x2, p = quant)
+
+	return(list(
+       coef = runif(1, coefLower, coefUpper),
+       mult = runif(1, multLower, multUpper),
+       mu = runif(1, muLower, muUpper),
+       sig = runif(1, sigLower, sigUpper),
+       jumpLoc2 = jl2
     ))
 }
 
@@ -207,7 +363,7 @@ pLogisAddBiv <- function(x1,x2,coef, mult1, mult2, loc, scale){
 #' Generate parameters for \code{pLogisAddBiv}
 #' 
 
-pLogisAddBiv <- function(...,coefLower=-4, coefUpper=4, mult1Lower=-1, mult1Upper=1, mult2Lower=-1, mult2Upper=1,
+pLogisAddBiv <- function(x1,x2,coefLower=-4, coefUpper=4, mult1Lower=-1, mult1Upper=1, mult2Lower=-1, mult2Upper=1,
                          locLower = -2, locUpper = 2, scaleLower = 0.25, scaleUpper = 2){
 	return(list(
        coef = runif(1, coefLower, coefUpper),

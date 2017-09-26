@@ -4,7 +4,33 @@
 \alias{plot.makeRandomData}
 \title{plot.makeRandomData}
 \usage{
-\method{plot}{makeRandomData}(object, g0 = TRUE, Q0 = TRUE, ask = FALSE)
+plot.makeRandomData(object, g0 = TRUE, Q0 = TRUE, ask = FALSE,
+  addMain = TRUE, nPoints = 1000, quantProbs = c(0.25, 0.75), nrow = 3,
+  ncol = 2, layOutNum = 1:(nrow * ncol), legLoc = "topleft")
+}
+\arguments{
+\item{object}{An object of class \code{"makeRandomData"}}
+
+\item{g0}{Make plots of propensity scores}
+
+\item{Q0}{Make plots of outcome regressions}
+
+\item{ask}{Make plots one-by-one (if TRUE) or put all on one page using \code{layout}}
+
+\item{addMain}{Add a somewhat descriptive main title to the plot?}
+
+\item{nPoints}{The number of points to plot for each line showing 
+propensity scores and outcome regressions}
+
+\item{quantProbs}{For variables that have interactions, the PS and OR are plotted
+at the median level of all variables not in the interaction and at these quantiles of
+any non-binary variables that are in the interaction. Defaults to the first and third quartile.
+Also by default if there is an interaction with a binary variable, rather than plotting curves
+at the quantile levels, the function plots at the unique values of the binary variable.}
+
+\item{layOutNum}{The matrix numbers fed to \code{layout}}
+
+\item{legLoc}{Passed to the \code{x} argument of \code{legend} to place legend (for all plots)}
 }
 \description{
 Plot the results of makeRandomData

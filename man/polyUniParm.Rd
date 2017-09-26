@@ -4,11 +4,10 @@
 \alias{polyUniParm}
 \title{polyUniParm}
 \usage{
-polyUniParm(npolyLower = 1, npolyUpper = 3, coefLower = -1,
-  coefUpper = 1, degLower = 1, degUpper = 3, ...)
+polyUniParm(npolyLower = 1, npolyUpper = 4, coefLower = -3,
+  coefUpper = 3, degLower = 1, degUpper = 4, ...)
 }
 \description{
 Draw random coefficient for polynomial relationship univariate relationship.
-See source code for distributions. 
- @export
+See source code for distributions.
 }

@@ -4,7 +4,7 @@
 \alias{bernoulliWCor}
 \title{bernoulliWCor}
 \usage{
-bernoulliWCor(n, x, r, ...)
+bernoulliWCor(n, W = NULL, r, whichCorr, ...)
 }
 \description{
 Draw bernoulli variable with prob x/r (to induce correlation)

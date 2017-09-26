@@ -16,8 +16,7 @@ jumpUni(x, njump, jumpLoc, jumpVal)
 \item{jumpVal}{A vector of length njump indicating the value of the function at each jump}
 }
 \value{
-The value of the jump function. 
- @export
+The value of the jump function.
 }
 \description{
 Simulate a jump function univariate relationship

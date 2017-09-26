@@ -4,8 +4,8 @@
 \alias{qGammaUniParm}
 \title{qGammaUniParm}
 \usage{
-qGammaUniParm(coefLower = -2, coefUpper = 2, aLower = 0.5, aUpper = 5,
-  bLower = 0.5, bUpper = 5, ...)
+qGammaUniParm(coefLower = -4, coefUpper = 4, aLower = 0.25, aUpper = 7,
+  bLower = 0.25, bUpper = 7, ...)
 }
 \description{
 Generate parameters for \code{qGammaUni}.

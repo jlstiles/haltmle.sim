@@ -13,10 +13,12 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	mainTermsG0 <- length(object$fnG0$uni)
 	bivTermsG0 <- length(object$fnG0$biv)
 	triTermsG0 <- length(object$fnG0$tri)
+	quadTermsG0 <- length(object$fnG0$quad)
 	# number of terms outcome
 	mainTermsQ0 <- length(object$fnQ0$uni)
 	bivTermsQ0 <- length(object$fnQ0$biv)
 	triTermsQ0 <- length(object$fnQ0$tri)
+	quadTermsQ0 <- length(object$fnQ0$quad)
 	# number binary covariates
 	uniqVals <- apply(object$W, 2, function(x){length(unique(x))})
 	numBinW <- sum(uniqVals == 2)
@@ -61,17 +63,20 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	allFunG0.uni <- .getTableFn(x = object$fnG0$uni, allF = object$funcG0.uni, uni = TRUE)
 	allFunG0.biv <- .getTableFn(x = object$fnG0$biv, allF = object$funcG0.biv)
 	allFunG0.tri <- .getTableFn(x = object$fnG0$tri, allF = object$funcG0.tri)
+	allFunG0.quad <- .getTableFn(x = object$fnG0$quad, allF = object$funcG0.quad)
 	
 	allFunQ0.uni <- .getTableFn(x = object$fnQ0$uni, allF = object$funcQ0.uni, Q = TRUE, uni = TRUE)
 	allFunQ0.biv <- .getTableFn(x = object$fnQ0$biv, allF = object$funcQ0.biv, Q = TRUE)
 	allFunQ0.tri <- .getTableFn(x = object$fnQ0$tri, allF = object$funcQ0.tri, Q = TRUE)
+	allFunQ0.quad <- .getTableFn(x = object$fnQ0$quad, allF = object$funcQ0.quad, Q = TRUE)
 
 	# noisy covariates
 	.numNoisyW <- function(object.fn, Q = FALSE){
 		whichWUni <- 1:length(object.fn$uni)
-		whichWBiv <- unique(unlist(lapply(object.fn$biv, "[[", "whichColsW")))
-		whichWTri <- unique(unlist(lapply(object.fn$tri, "[[", "whichColsW")))
-		usedW <- length(unique(c(whichWUni, whichWBiv, whichWTri)))
+		whichWBiv <- unique(unlist(lapply(object.fn$biv, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWTri <- unique(unlist(lapply(object.fn$tri, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWQuad <- unique(unlist(lapply(object.fn$quad, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		usedW <- length(unique(c(whichWUni, whichWBiv, whichWTri, whichWQuad)))
 		if(Q) usedW <- usedW - 1  # A is always used
 		nNoise <- D - usedW
 		return(nNoise)
@@ -80,6 +85,37 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	numNoisyG0 <- .numNoisyW(object.fn = object$fnG0)
 	numNoisyQ0 <- .numNoisyW(object.fn = object$fnQ0, Q = TRUE)
 	
+	# instrumental variables and precision variables
+	.getInsPrec <- function(object.fn.Q, object.fn.G){
+		# what columns of W are associated with Y 
+		Q <- TRUE
+		whichWUni.Q <- 1:length(object.fn.Q$uni)
+		whichWBiv.Q <- unique(unlist(lapply(object.fn.Q$biv, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWTri.Q <- unique(unlist(lapply(object.fn.Q$tri, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWQuad.Q <- unique(unlist(lapply(object.fn.Q$quad, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		# subtract 1 from columns to account for fact that A is added to AW
+		usedW.Q <- unique(c(whichWUni.Q, whichWBiv.Q, whichWTri.Q, whichWQuad.Q)) - 1
+		usedW.Q <- usedW.Q[-1]
+		
+		# what columns of W are associated with A
+		Q <- FALSE
+		whichWUni.G <- 1:length(object.fn.G$uni)
+		whichWBiv.G <- unique(unlist(lapply(object.fn.G$biv, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWTri.G <- unique(unlist(lapply(object.fn.G$tri, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		whichWQuad.G <- unique(unlist(lapply(object.fn.G$quad, "[[", ifelse(Q,"whichColsAW","whichColsW"))))
+		usedW.G <- unique(c(whichWUni.G, whichWBiv.G, whichWTri.G, whichWQuad.G))
+
+		# number of instruments
+		nIns <- sum(!(usedW.G %in% usedW.Q))
+		# number of precision variables
+		nPrec <- sum(!(usedW.Q %in% usedW.G))
+
+		return(list(nIns = nIns, nPrec = nPrec))
+	}
+
+	# get precision and instruments
+	ip <- .getInsPrec(object$fnG0, object$fnQ0)
+
 	# generate big observed data set
 	set.seed(seed)
 	bigObs <- remakeRandomData(n = N, object = object)
@@ -88,8 +124,10 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	bigSet_1 <- remakeRandomData(n = N, object = object, setA = 1)
 	bigSet_0 <- remakeRandomData(n = N, object = object, setA = 0)
 
-	# r-squared for \bar{Q}_0(1,W)
-	r2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
+	# r-squared for \bar{Q}_0(A,W)
+	r2.Q <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
+	# r-squared for g_0(A,W)
+	r2.G <- 1 - mean((bigObs$A - bigObs$g0)^2)/var(bigObs$A)
 	# true ATE
 	truth <- mean(bigSet_1$Y) - mean(bigSet_0$Y)
 	# marginal observed P(A = 1)
@@ -109,12 +147,14 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	nCorr3 <- sum(corrW >= 0.4 & corrW < 0.6)
 	nCorr4 <- sum(corrW > 0.6)
 
+	# TO DO: COMPUTE AVERAGE CORRELATION! 
+	
 	# error distribution
-	corErr <- cor(cbind(bigObs$err,bigObs$W))[,1]
-	nCorr1 <- sum(corrW < 0.1)
-	nCorr2 <- sum(corrW >= 0.1 & corrW < 0.4)
-	nCorr3 <- sum(corrW >= 0.4 & corrW < 0.6)
-	nCorr4 <- sum(corrW > 0.6)
+	# corErr <- cor(cbind(bigObs$err,bigObs$W))[,1]
+	# nCorr1 <- sum(corrW < 0.1)
+	# nCorr2 <- sum(corrW >= 0.1 & corrW < 0.4)
+	# nCorr3 <- sum(corrW >= 0.4 & corrW < 0.6)
+	# nCorr4 <- sum(corrW > 0.6)
 
 	# measure of error dependence on W
 	# by default package only includes error distributions that 
@@ -126,14 +166,15 @@ summary.makeRandomData <- function(object, N = 1e6, seed = 1234, ...){
 	corSqErrW <- cor(bigObs$err^2,bigObs$W[,1])
 
 	out <- list(
-     n = length(object$A), sumA1 = sum(object$A==1), D = D, minObsG0 = minObsG0,
-     mainTermsG0 = mainTermsG0, bivTermsG0 = bivTermsG0, triTermsG0 = triTermsG0,
-     mainTermsQ0 = mainTermsQ0, bivTermsQ0 = bivTermsQ0, triTermsQ0 = triTermsQ0,
-     fnG0.table = list(allFunG0.uni, allFunG0.biv, allFunG0.tri),
-     fnQ0.table = list(allFunQ0.uni, allFunQ0.biv, allFunQ0.tri),
+     n = length(object$A$A), sumA1 = sum(object$A==1), D = D, minObsG0 = minObsG0,
+     mainTermsG0 = mainTermsG0, bivTermsG0 = bivTermsG0, triTermsG0 = triTermsG0, quadTermsG0 = quadTermsG0,
+     mainTermsQ0 = mainTermsQ0, bivTermsQ0 = bivTermsQ0, triTermsQ0 = triTermsQ0, quadTermsQ0 = quadTermsQ0,
+     fnG0.table = list(allFunG0.uni, allFunG0.biv, allFunG0.tri, allFunG0.quad),
+     fnQ0.table = list(allFunQ0.uni, allFunQ0.biv, allFunQ0.tri, allFunQ0.quad),
      numBinW = numBinW, numCatW = numCatW, numContW = numContW,
      numNoisyG0 = numNoisyG0, numNoisyQ0 = numNoisyQ0, 
-     PA1 = PA1, r2 = r2, truth = truth, varEffIC = varEffIC, obsATE = obsATE,
+     numIns = ip$nIns, numPrec = ip$nPrec,
+     PA1 = PA1, r2.G = r2.G, r2.Q = r2.Q, truth = truth, varEffIC = varEffIC, obsATE = obsATE,
      nCorr1 = nCorr1, nCorr2 = nCorr2, nCorr3 = nCorr3, nCorr4 = nCorr4, 
      corSqErrW = corSqErrW, errDist = object$distErrY
   	)

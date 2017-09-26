@@ -4,7 +4,8 @@
 \alias{bernoulliWCorParm}
 \title{bernoulliWCorParm}
 \usage{
-bernoulliWCorParm(rLower = 0.5, rUpper = 2)
+bernoulliWCorParm(W = NULL, rLower = -2, rUpper = 2, nCorrLower = 1,
+  nCorrUpper = ncol(W))
 }
 \description{
 Generate parameters for \code{bernoulliCorParm} (smaller r = more correlation)

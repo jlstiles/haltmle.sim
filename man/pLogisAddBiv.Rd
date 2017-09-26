@@ -5,11 +5,11 @@
 \alias{pLogisAddBiv}
 \title{pLogisAddBiv}
 \usage{
-pLogisAddBiv(..., coefLower = -4, coefUpper = 4, mult1Lower = -1,
+pLogisAddBiv(x1, x2, coefLower = -4, coefUpper = 4, mult1Lower = -1,
   mult1Upper = 1, mult2Lower = -1, mult2Upper = 1, locLower = -2,
   locUpper = 2, scaleLower = 0.25, scaleUpper = 2)
 
-pLogisAddBiv(..., coefLower = -4, coefUpper = 4, mult1Lower = -1,
+pLogisAddBiv(x1, x2, coefLower = -4, coefUpper = 4, mult1Lower = -1,
   mult1Upper = 1, mult2Lower = -1, mult2Upper = 1, locLower = -2,
   locUpper = 2, scaleLower = 0.25, scaleUpper = 2)
 }

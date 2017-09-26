@@ -5,7 +5,7 @@
 \title{uniformWParm}
 \usage{
 uniformWParm(lowerLower = -10, lowerUpper = 0, rangeLower = 0.5,
-  rangeUpper = 10)
+  rangeUpper = 10, ...)
 }
 \description{
 Generate parameters for \code{uniform}

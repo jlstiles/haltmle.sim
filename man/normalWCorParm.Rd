@@ -4,7 +4,8 @@
 \alias{normalWCorParm}
 \title{normalWCorParm}
 \usage{
-normalWCorParm(sdLower = 0.25, sdUpper = 2)
+normalWCorParm(W = NULL, sdLower = 0.25, sdUpper = 4, nCorrLower = 1,
+  nCorrUpper = ncol(W))
 }
 \description{
 Generate parameters for \code{normalCor} (smaller SD = more correlation)

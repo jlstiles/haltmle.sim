@@ -4,9 +4,9 @@
 \alias{polyBivParm}
 \title{polyBivParm}
 \usage{
-polyBivParm(npolyLower = 1, npolyUpper = 1, coefLower = -0.25,
+polyBivParm(npolyLower = 1, npolyUpper = 2, coefLower = -0.25,
   coefUpper = 0.25, deg1Lower = 1, deg1Upper = 3, deg2Lower = 1,
-  deg2Upper = 3, ...)
+  deg2Upper = 3, x1, x2)
 }
 \description{
 Generate parameters for \code{polyBiv}.

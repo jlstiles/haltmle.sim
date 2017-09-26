@@ -17,9 +17,61 @@ linUni <- function(x, coef){
 #' 
 #' Draw random coefficient for linear univariate relationship
 #' @export
-linUniParm <- function(coefLower = -2, coefUpper = 2, ...){
+linUniParm <- function(coefLower = -10, coefUpper = 10, ...){
 	return(list(coef = runif(1, coefLower, coefUpper)))
 }
+
+#' linSplineUni
+#' @export
+linSplineUni <- function(x, nKnot, knotLoc, slopes){
+	y <- rep(0, length(x))
+	kl <- c(min(x),knotLoc)
+	# make basis
+	for(k in 1:(nKnot+1)){
+		xb <- pmax(0, x - kl[k])
+		y <- y + xb * slopes[k]
+	}
+	return(y)
+}
+
+#' linSplineUniParm
+#' @export
+linSplineUniParm <- function(x, slopeLower = -10, slopeUpper = 10, 
+                             nKnotLower = 1, nKnotUpper = 5,
+                             quantLower = 0.05, quantUpper = 0.95){
+	nKnot <- round(runif(1, nKnotLower - 0.5, nKnotUpper + 0.5))
+	slopes <- runif(nKnot + 1, slopeLower, slopeUpper)
+	knotLoc <- sort(quantile(x, p = runif(nKnot, quantLower, quantUpper)))
+	return(list(nKnot = nKnot, slopes = slopes, knotLoc = knotLoc))
+}
+
+
+#' cubicSplineUni
+#' @export
+cubicSplineUni <- function(x, main, nKnot, knotLoc, slopes){
+	kl <- c(min(x),knotLoc)
+	y <- main[1]*x + main[2]*x^2 + main[3]*x^3
+	# make basis
+	for(k in 1:(nKnot+1)){
+		xb <- pmax(0, x - kl[k])^3
+		y <- y + xb * slopes[k]
+	}
+	return(y)
+}
+
+#' cubicSplineUniParm
+#' @export
+cubicSplineUniParm <- function(x, mainLower = -0.5, mainUpper = 0.5,
+                              splineLower = -1, splineUpper = 1,
+                             nKnotLower = 1, nKnotUpper = 20,
+                             quantLower = 0.05, quantUpper = 0.95){
+	main <- runif(3, mainLower, mainUpper)
+	nKnot <- round(runif(1, nKnotLower - 0.5, nKnotUpper + 0.5))
+	slopes <- runif(nKnot + 1, splineLower, splineUpper)
+	knotLoc <- sort(quantile(x, p = runif(nKnot, quantLower, quantUpper)))
+	return(list(main = main, nKnot = nKnot, slopes = slopes, knotLoc = knotLoc))
+}
+
 
 #' polyUni
 #' 
@@ -49,9 +101,11 @@ polyUni <- function(x, npoly, coef, deg){
 #' 
 #' Draw random coefficient for polynomial relationship univariate relationship.
 #' See source code for distributions. 
-#'  @export
-polyUniParm <- function(npolyLower = 1, npolyUpper = 3, coefLower = -1, coefUpper = 1,
-                        degLower = 1, degUpper = 3, ...){
+#' 
+#' @export
+
+polyUniParm <- function(npolyLower = 1, npolyUpper = 4, coefLower = -3, coefUpper = 3,
+                        degLower = 1, degUpper = 4, ...){
 	npoly <- round(runif(1, npolyLower - 0.5, npolyUpper + 0.5))
 	coef <- runif(npoly, coefLower, coefUpper)
 	deg <- round(runif(npoly, 0.5, 3.5))
@@ -68,7 +122,7 @@ polyUniParm <- function(npolyLower = 1, npolyUpper = 3, coefLower = -1, coefUppe
 #' @param amp The amplitude of the sin function
 #'
 #' @return \code{amp*sin(p*x)}
-#'  @export
+#' @export
 sinUni <- function(x, p, amp){
 	w <- amp*sin(p*x)
 	return(w)
@@ -78,8 +132,8 @@ sinUni <- function(x, p, amp){
 #' 
 #' Draw random periodicity and amplitude for sinusoidal relationship univariate relationship.
 #' See source code for distributions. 
-#'  @export
-sinUniParm <- function(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, ...){
+#' @export
+sinUniParm <- function(pLower = -4, pUpper = 4, ampLower = -4, ampUpper = 4, ...){
 	p <- runif(1, pLower, pUpper)
 	amp <- runif(1, ampLower, ampUpper)
 	return(list(p = p, amp = amp))
@@ -95,7 +149,7 @@ sinUniParm <- function(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, ...
 #' @param jumpVal A vector of length njump indicating the value of the function at each jump
 #'
 #' @return The value of the jump function. 
-#'  @export
+#' @export
 
 jumpUni <- function(x, njump, jumpLoc, jumpVal){
 	tmp <- rep(0, length(x))
@@ -113,8 +167,11 @@ jumpUni <- function(x, njump, jumpLoc, jumpVal){
 #' of numbers. See source code for how exactly it works. 
 #' @export
 
-jumpUniParm <- function(x, njumpLower = 1, njumpUpper = 5, jumpLower = -2, jumpUpper = 2,
-                        jumpLoc = function(x,njump){ quantile(x, seq(0,1,length=njump+1)) }){
+jumpUniParm <- function(x, njumpLower = 1, njumpUpper = 8, 
+                        jumpLower = -4, jumpUpper = 4,
+                        jumpLoc = function(x,njump){ 
+                        	quantile(x, seq(0,1,length=njump+1)) 
+                        }){
 	njump <- round(runif(1, njumpLower - 0.5, njumpUpper + 0.5))
 	jumpL <- do.call("jumpLoc", args = list(x = x, njump = njump))
 	jumps <- runif(njump, jumpLower, jumpUpper)
@@ -138,8 +195,10 @@ qGammaUni <- function(x, coef, a, b, ...){
 #' qGammaUniParm
 #' 
 #' Generate parameters for \code{qGammaUni}. 
-qGammaUniParm <- function(coefLower = -2, coefUpper = 2, aLower = 0.5, aUpper = 5, 
-                          bLower = 0.5, bUpper = 5,...){
+#' @export
+#' 
+qGammaUniParm <- function(coefLower = -4, coefUpper = 4, aLower = 0.25, aUpper = 7, 
+                          bLower = 0.25, bUpper = 7,...){
 	coef <- runif(1, coefLower, coefUpper)
 	a <- runif(1, aLower, aUpper)
 	b <- runif(1, bLower, bUpper)
@@ -164,7 +223,7 @@ dNormUni <- function(x, coef, mu, sig){
 #' Generate parameters for \code{dNormUni}
 #' @export
 dNormUniParm <- function(...,coefLower = -4, coefUpper = 4, 
-                         muLower=-5, muUpper=5, sigLower=0.25, sigUpper=3){
+                         muLower=-5, muUpper=5, sigLower=0.25, sigUpper=4){
 	coef <- runif(1, coefLower, coefUpper)
 	mu <- runif(1, muLower, muUpper)
 	sig <- runif(1, sigLower, sigUpper)
@@ -187,8 +246,10 @@ pLogisUni <- function(x, coef, mult, loc, scale){
 #' Parameters for \code{pLogisUni}
 #' @export
 #' 
-pLogisUniParm <- function(...,coefLower=-2, coefUpper=2, multLower=-2, multUpper=2,
-                          locLower = -2, locUpper = 2, scaleLower = 0.25, scaleUpper = 2){
+pLogisUniParm <- function(...,coefLower=-4, coefUpper=4, 
+                          multLower=-4, multUpper=4,
+                          locLower = -4, locUpper = 4, 
+                          scaleLower = 0.25, scaleUpper = 4){
 	coef <- runif(1, coefLower, coefUpper)
 	mult <- runif(1, multLower, multUpper)
     loc <- runif(1, locLower, locUpper)
@@ -215,12 +276,12 @@ dNormMixUni <- function(x, coef1, coef2, mu1, mu2, sig1, sig2){
 #' 
 #' Generate parameters for \code{dNormMixUni}
 #' @export
-dNormMixUniParm <- function(...,coef1Lower = -2, coef1Upper = 2, 
-                            coef2Lower = -2, coef2Upper = 2, 
-                            mu1Lower = -5, mu1Upper = 5,
-                            mu2Lower = -5, mu2Upper = 5,
-                            sig1Lower = 0.5, sig1Upper = 2,
-                            sig2Lower = 0.5, sig2Upper = 2
+dNormMixUniParm <- function(...,coef1Lower = -4, coef1Upper = 4, 
+                            coef2Lower = -4, coef2Upper = 4, 
+                            mu1Lower = -10, mu1Upper = 10,
+                            mu2Lower = -10, mu2Upper = 10,
+                            sig1Lower = 0.5, sig1Upper = 4,
+                            sig2Lower = 0.5, sig2Upper = 4
                             ){
 	return(
        list(coef1 = runif(1, coef1Lower, coef1Upper),

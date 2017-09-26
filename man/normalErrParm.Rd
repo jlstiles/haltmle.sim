@@ -4,7 +4,7 @@
 \alias{normalErrParm}
 \title{normalErrParm}
 \usage{
-normalErrParm(sdLower = 0.5, sdUpper = 7)
+normalErrParm(..., sdLower = 0.5, sdUpper = 7)
 }
 \description{
 Draw a random standard deviation for \code{normalErr}

@@ -4,10 +4,10 @@
 \alias{dNormMixUniParm}
 \title{dNormMixUniParm}
 \usage{
-dNormMixUniParm(..., coef1Lower = -2, coef1Upper = 2, coef2Lower = -2,
-  coef2Upper = 2, mu1Lower = -5, mu1Upper = 5, mu2Lower = -5,
-  mu2Upper = 5, sig1Lower = 0.5, sig1Upper = 2, sig2Lower = 0.5,
-  sig2Upper = 2)
+dNormMixUniParm(..., coef1Lower = -4, coef1Upper = 4, coef2Lower = -4,
+  coef2Upper = 4, mu1Lower = -10, mu1Upper = 10, mu2Lower = -10,
+  mu2Upper = 10, sig1Lower = 0.5, sig1Upper = 4, sig2Lower = 0.5,
+  sig2Upper = 4)
 }
 \description{
 Generate parameters for \code{dNormMixUni}

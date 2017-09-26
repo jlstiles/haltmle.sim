@@ -4,7 +4,7 @@
 \alias{sinBivParm}
 \title{sinBivParm}
 \usage{
-sinBivParm(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, ...)
+sinBivParm(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, x1, x2)
 }
 \description{
 Generate parameters for \code{sinBiv}

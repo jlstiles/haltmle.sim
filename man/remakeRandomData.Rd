@@ -4,36 +4,20 @@
 \alias{remakeRandomData}
 \title{remakeRandomData}
 \usage{
-remakeRandomData(n, object, setA = NULL, ...)
+remakeRandomData(n, object, setA = NULL, setW = NULL, ...)
 }
 \arguments{
 \item{n}{A \code{numeric} sample size}
 
-\item{maxD}{A \code{numeric} indicating maximum number of covariates}
+\item{object}{An object of class \code{"makeRandomData"}}
 
-\item{distW.uncor}{A \code{vector} of \code{characters} that are functions in the global environment that 
-generate covariates. These functions should have an associated parameter function with \code{"Parm"} added 
-to the end of their name. See the format of the functions provided to understand their structure.}
+\item{setA}{Value(s) to set treatment variable to. If \code{NULL} then treatment
+is simulated according to observed data functions. If \code{length(A)==1} then all
+values are set to this single value. Otherwise, if A is a vector of length n, A is set
+according to this vector.}
 
-\item{distW.cor}{Same as above, but generates a correlated covariate}
-
-\item{funcG0.uni}{A \code{vector} of \code{characters} that are functions in the global environment that
-are used to generate main terms for logit of the propensity score.}
-
-\item{funcG0.biv}{Ditto above, but for bivariate functions.}
-
-\item{funcG0.tri}{Ditto above, but for trivariate functions.}
-
-\item{funcQ0.uni}{Ditto \code{funcG0.uni}, but for the outcome regression}
-
-\item{funcQ0.biv}{Ditto}
-
-\item{funcQ0.tri}{Ditto}
-
-\item{errY}{A \code{vector} of \code{characters} that are functions in the global environment that 
-are used to generate error terms for the outcome regression.}
-
-\item{minG0}{The minimum value for the propensity score (default 0.01).}
+\item{setW}{A matrix of proper size with values of covariates set to fixed levels. Useful for
+plotting methods. Assumes proper dimensions. If \code{NULL} simulates W according to distributions.}
 }
 \value{
 An object of class \code{"makeRandomData"} with the following entries

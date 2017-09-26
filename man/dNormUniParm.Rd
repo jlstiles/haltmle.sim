@@ -5,7 +5,7 @@
 \title{dNormUniParm}
 \usage{
 dNormUniParm(..., coefLower = -4, coefUpper = 4, muLower = -5,
-  muUpper = 5, sigLower = 0.25, sigUpper = 3)
+  muUpper = 5, sigLower = 0.25, sigUpper = 4)
 }
 \description{
 Generate parameters for \code{dNormUni}

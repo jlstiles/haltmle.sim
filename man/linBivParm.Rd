@@ -4,7 +4,7 @@
 \alias{linBivParm}
 \title{linBivParm}
 \usage{
-linBivParm(coefLower = -2, coefUpper = 2, ...)
+linBivParm(coefLower = -4, coefUpper = 4, x1, x2)
 }
 \description{
 Generate coefficient for \code{linBiv}

@@ -4,7 +4,7 @@
 \alias{dNormMultBivParm}
 \title{dNormMultBivParm}
 \usage{
-dNormMultBivParm(..., coefLower = -5, coefUpper = 5, multLower = -1,
+dNormMultBivParm(x1, x2, coefLower = -5, coefUpper = 5, multLower = -1,
   multUpper = 1, muLower = -2, muUpper = 2, sigLower = 0.5,
   sigUpper = 2)
 }

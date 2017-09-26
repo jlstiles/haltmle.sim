@@ -5,7 +5,8 @@
 \title{gammaErrParm
 Generate parameters for \code{gammaErr}}
 \usage{
-gammaErrParm(aLower = 0.1, aUpper = 7.5, bLower = 0.1, bUpper = 7.5)
+gammaErrParm(..., aLower = 0.1, aUpper = 7.5, bLower = 0.1,
+  bUpper = 7.5)
 }
 \description{
 gammaErrParm

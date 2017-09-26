@@ -11,7 +11,5 @@ install("haltmle.sim")
 
 # debugging makeRandomData
 library(haltmle.sim)
-#debug(makeRandomData)
-object <- makeRandomData(n = 500, maxD = 6)
-plot(object, ask = TRUE)
-summary(object)
+# #debug(makeRandomData)
+object <- makeRandomData(n = 500, maxD = 1)

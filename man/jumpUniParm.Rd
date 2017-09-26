@@ -4,8 +4,8 @@
 \alias{jumpUniParm}
 \title{jumpUniParm}
 \usage{
-jumpUniParm(x, njumpLower = 1, njumpUpper = 5, jumpLower = -2,
-  jumpUpper = 2, jumpLoc = function(x, njump) {     quantile(x, seq(0, 1,
+jumpUniParm(x, njumpLower = 1, njumpUpper = 8, jumpLower = -4,
+  jumpUpper = 4, jumpLoc = function(x, njump) {     quantile(x, seq(0, 1,
   length = njump + 1)) })
 }
 \description{

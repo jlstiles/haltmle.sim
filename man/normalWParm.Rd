@@ -4,7 +4,8 @@
 \alias{normalWParm}
 \title{normalWParm}
 \usage{
-normalWParm(meanLower = -2, meanUpper = 2, sdLower = 0.25, sdUpper = 2)
+normalWParm(meanLower = -2, meanUpper = 2, sdLower = 0.25, sdUpper = 2,
+  ...)
 }
 \description{
 Generate parameters for \code{normal}

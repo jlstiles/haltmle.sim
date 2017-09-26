@@ -4,10 +4,9 @@
 \alias{sinUniParm}
 \title{sinUniParm}
 \usage{
-sinUniParm(pLower = -1, pUpper = 1, ampLower = -1, ampUpper = 1, ...)
+sinUniParm(pLower = -4, pUpper = 4, ampLower = -4, ampUpper = 4, ...)
 }
 \description{
 Draw random periodicity and amplitude for sinusoidal relationship univariate relationship.
-See source code for distributions. 
- @export
+See source code for distributions.
 }

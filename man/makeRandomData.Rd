@@ -4,29 +4,38 @@
 \alias{makeRandomData}
 \title{makeRandomData}
 \usage{
-makeRandomData(n, maxD, distW.uncor = c("uniformW", "normalW", "bernoulliW",
-  "binomialW", "gammaW"), distW.cor = c("normalWCor", "bernoulliWCor",
-  "uniformWCor"), funcG0.uni = c("linUni", "polyUni", "sinUni", "jumpUni",
-  "pLogisUni", "dNormUni", "qGammaUni", "dNormMixUni"),
+makeRandomData(n, maxD, func.distW = c("uniformW", "normalW", "bernoulliW",
+  "binomialW", "gammaW", "normalWCor", "bernoulliWCor", "uniformWCor",
+  "gammaPointMassW", "binomialFracW", "normalPointMassW"),
+  funcG0.uni = c("linUni", "polyUni", "sinUni", "jumpUni", "pLogisUni",
+  "dNormUni", "qGammaUni", "dNormMixUni", "cubicSplineUni", "linSplineUni"),
   funcG0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv", "dNormAddBiv",
-  "dNormMultBiv"), funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"),
+  "dNormMultBiv", "polyJumpBiv", "sinJumpBiv", "dNormMultJumpBiv",
+  "linSplineBiv"), funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
+  "linJump2Tri", "linJump1Tri", "polyJump2Tri", "polyJump1Tri", "sinJump2Tri",
+  "sinJump1Tri", "dNormAddTri", "dNormMultTri", "dNormMultJump2Tri",
+  "dNormMultJump1Tri", "pLogisAddTri"), funcG0.quad = c("linQuad", "polyQuad",
+  "sinQuad", "jumpQuad", "linJump2Quad", "linJump1Quad", "polyJump2Quad",
+  "polyJump1Quad", "sinJump2Quad", "sinJump1Quad", "dNormAddQuad",
+  "dNormMultQuad", "dNormMultJump2Quad", "dNormMultJump1Quad", "pLogisAddQuad"),
   funcQ0.uni = c("linUni", "polyUni", "sinUni", "jumpUni", "pLogisUni",
-  "dNormUni", "qGammaUni", "dNormMixUni"), funcQ0.biv = c("linBiv", "polyBiv",
-  "sinBiv", "jumpBiv", "dNormAddBiv", "dNormMultBiv"),
-  funcQ0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"),
-  errY = c("normalErr", "uniformErr", "gammaErr", "normalErrW",
-  "uniformErrW"), minG0 = 0.01, ...)
+  "dNormUni", "qGammaUni", "dNormMixUni", "cubicSplineUni", "linSplineUni"),
+  funcQ0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv", "dNormAddBiv",
+  "dNormMultBiv", "polyJumpBiv", "sinJumpBiv", "dNormMultJumpBiv",
+  "linSplineBiv"), funcQ0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
+  "linJump2Tri", "linJump1Tri", "polyJump2Tri", "polyJump1Tri", "sinJump2Tri",
+  "sinJump1Tri", "dNormAddTri", "dNormMultTri", "dNormMultJump2Tri",
+  "dNormMultJump1Tri", "pLogisAddTri"), funcQ0.quad = c("linQuad", "polyQuad",
+  "sinQuad", "jumpQuad", "linJump2Quad", "linJump1Quad", "polyJump2Quad",
+  "polyJump1Quad", "sinJump2Quad", "sinJump1Quad", "dNormAddQuad",
+  "dNormMultQuad", "dNormMultJump2Quad", "dNormMultJump1Quad", "pLogisAddQuad"),
+  errY = c("normalErr", "uniformErr", "gammaErr", "normalErrAW",
+  "uniformErrAW"), minG0 = 0.001, minR2 = 0.01, maxR2 = 0.99, ...)
 }
 \arguments{
 \item{n}{A \code{numeric} sample size}
 
 \item{maxD}{A \code{numeric} indicating maximum number of covariates}
-
-\item{distW.uncor}{A \code{vector} of \code{characters} that are functions in the global environment that 
-generate covariates. These functions should have an associated parameter function with \code{"Parm"} added 
-to the end of their name. See the format of the functions provided to understand their structure.}
-
-\item{distW.cor}{Same as above, but generates a correlated covariate}
 
 \item{funcG0.uni}{A \code{vector} of \code{characters} that are functions in the global environment that
 are used to generate main terms for logit of the propensity score.}
@@ -45,6 +54,12 @@ are used to generate main terms for logit of the propensity score.}
 are used to generate error terms for the outcome regression.}
 
 \item{minG0}{The minimum value for the propensity score (default 0.01).}
+
+\item{distW.uncor}{A \code{vector} of \code{characters} that are functions in the global environment that 
+generate covariates. These functions should have an associated parameter function with \code{"Parm"} added 
+to the end of their name. See the format of the functions provided to understand their structure.}
+
+\item{distW.cor}{Same as above, but generates a correlated covariate}
 }
 \value{
 An object of class \code{"makeRandomData"} with the following entries

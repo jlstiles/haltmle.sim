@@ -4,7 +4,8 @@
 \alias{binomialWParm}
 \title{binomialWParm}
 \usage{
-binomialWParm(pLower = 0.1, pUpper = 0.9, numLower = 2, numUpper = 10)
+binomialWParm(pLower = 0.1, pUpper = 0.9, numLower = 2, numUpper = 20,
+  ...)
 }
 \description{
 Generate parameters for \code{binomial}

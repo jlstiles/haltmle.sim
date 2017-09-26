@@ -87,20 +87,44 @@
 
 makeRandomData <- function(n, 
                            maxD,  
-                           distW.uncor = c("uniformW","normalW","bernoulliW","binomialW","gammaW"), 
-                           distW.cor = c("normalWCor","bernoulliWCor","uniformWCor"), 
+                           func.distW = c("uniformW","normalW","bernoulliW","binomialW","gammaW",
+                                     "normalWCor","bernoulliWCor","uniformWCor", "gammaPointMassW",
+                                     "binomialFracW","normalPointMassW"), 
                            funcG0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
-                                          "dNormUni","qGammaUni","dNormMixUni"), 
+                                          "dNormUni","qGammaUni","dNormMixUni","cubicSplineUni",
+                                          "linSplineUni"), 
                            funcG0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
-                                          "dNormAddBiv","dNormMultBiv"), 
-                           funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri"), 
+                               "dNormAddBiv","dNormMultBiv","polyJumpBiv",
+                               "sinJumpBiv","dNormMultJumpBiv","linSplineBiv"), 
+                           funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
+	                            "linJump2Tri","linJump1Tri","polyJump2Tri",
+	                            "polyJump1Tri","sinJump2Tri","sinJump1Tri",
+	                            "dNormAddTri","dNormMultTri","dNormMultJump2Tri",
+	                            "dNormMultJump1Tri","pLogisAddTri"), 
+                           funcG0.quad = c("linQuad", "polyQuad", "sinQuad", "jumpQuad",
+	                            "linJump2Quad","linJump1Quad","polyJump2Quad",
+	                            "polyJump1Quad","sinJump2Quad","sinJump1Quad",
+	                            "dNormAddQuad","dNormMultQuad","dNormMultJump2Quad",
+	                            "dNormMultJump1Quad","pLogisAddQuad"),
                            funcQ0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
-                                          "dNormUni","qGammaUni","dNormMixUni"), 
+                                          "dNormUni","qGammaUni","dNormMixUni","cubicSplineUni",
+                                          "linSplineUni"), 
                            funcQ0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
-                                          "dNormAddBiv","dNormMultBiv"), 
-                           funcQ0.tri = c("linTri","polyTri","sinTri","jumpTri"), 
-                           errY = c("normalErr","uniformErr","gammaErr","normalErrW","uniformErrW"),
-                           minG0 = 1e-2, 
+                               "dNormAddBiv","dNormMultBiv","polyJumpBiv",
+                               "sinJumpBiv","dNormMultJumpBiv","linSplineBiv"), 
+                           funcQ0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
+	                            "linJump2Tri","linJump1Tri","polyJump2Tri",
+	                            "polyJump1Tri","sinJump2Tri","sinJump1Tri",
+	                            "dNormAddTri","dNormMultTri","dNormMultJump2Tri",
+	                            "dNormMultJump1Tri","pLogisAddTri"), 
+                           funcQ0.quad = c("linQuad", "polyQuad", "sinQuad", "jumpQuad",
+	                            "linJump2Quad","linJump1Quad","polyJump2Quad",
+	                            "polyJump1Quad","sinJump2Quad","sinJump1Quad",
+	                            "dNormAddQuad","dNormMultQuad","dNormMultJump2Quad",
+	                            "dNormMultJump1Quad","pLogisAddQuad"),
+                           errY = c("normalErr","uniformErr","gammaErr","normalErrAW","uniformErrAW"),
+                           minG0 = 1e-3,
+                           minR2 = 0.01, maxR2 = 0.99,
                            ...){
 	# draw random number of covariates
 	D <- round(runif(1, 0.5, maxD+0.5))
@@ -115,18 +139,18 @@ makeRandomData <- function(n,
 		# randomly sample distribution
 		if(d==1){
 			# sample distribution
-			thisD <- sample(distW.uncor, 1)
+			thisD <- sample(func.distW, 1)
 			# generate parameters
-			thisParm <- do.call(paste0(thisD,"Parm"), args = list())
+			thisParm <- do.call(paste0(thisD,"Parm"), args = list(W = NULL))
 			# generate covariate
-			W[,d] <- do.call(thisD, args = c(list(n=n), thisParm))
+			W[,d] <- do.call(thisD, args = c(list(n=n, W = NULL), thisParm))
 		}else{
 			# sample distribution
-			thisD <- sample(c(distW.uncor,distW.cor), 1)
+			thisD <- sample(func.distW, 1)
 			# generate parameters
-			thisParm <- do.call(paste0(thisD,"Parm"), args = list())
+			thisParm <- do.call(paste0(thisD,"Parm"), args = list(W = data.frame(W[,1:(d-1),drop=FALSE])))
 			# generate covariate
-			W[,d] <- do.call(thisD, args = c(list(n=n, x = W[,d-1]), thisParm))
+			W[,d] <- do.call(thisD, args = c(list(n=n, W = data.frame(W[,1:(d-1),drop=FALSE])), thisParm))
 		}
 		# save distributions
 		distW[[d]]$fn <- thisD; distW[[d]]$parm <- thisParm
@@ -137,40 +161,48 @@ makeRandomData <- function(n,
 	# Simulate propensity
 	#----------------------------------------------------------------------
 	# draw random number of main terms
-	Mg1 <- round(runif(1, 0.5, D + 0.5))
+	Mg1 <- round(runif(1, -0.5, D + 0.5))
 
 	# draw random number of two-way interaction terms
-	Mg2 <- ifelse(Mg1 > 1, round(runif(1, 0.5, Mg1 - 0.5)), 0)
+	Mg2 <- round(runif(1, -0.5, D + 0.5))
 
 	# draw random number of three-way interaction terms
-	Mg3 <- ifelse(Mg2 > 1, round(runif(1, 0.5, Mg2 - 0.5)), 0)
+	Mg3 <- round(runif(1, -0.5, D + 0.5))
+
+	# draw random number of four-way interaction terms
+	Mg4 <- round(runif(1, -0.5, D + 0.5))
 
 	# initialize empty
 	logitg0 <- rep(0, n)
 
 	# univariate
-	uniG0 <- vector(mode="list", length = Mg1)
-	for(m in 1:Mg1){
-		# draw random function
-		thisF <- sample(funcG0.uni, 1)
-		# get parameters
-		thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = W[,m]))
-		# call function with parameters 
-		fOut <- do.call(thisF, args = c(list(x = W[,m]), thisParm))
-		# save output in list
-		uniG0[[m]] <- list(fn = thisF, parm = thisParm)
-		# add to current logitg0
-		logitg0 <- logitg0 + fOut
+	if(Mg1 > 0){
+		uniG0 <- vector(mode="list", length = Mg1)
+		for(m in 1:Mg1){
+			# draw random function
+			thisF <- sample(funcG0.uni, 1)
+			# draw random column of W
+			wCol <- sample(1:ncol(W), 1)
+			# get parameters
+			thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = W[,wCol]))
+			# call function with parameters 
+			fOut <- do.call(thisF, args = c(list(x = W[,wCol]), thisParm))
+			# save output in list
+			uniG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = wCol)
+			# add to current logitg0
+			logitg0 <- logitg0 + fOut
+		}
+	}else{
+		uniG0 <- NULL
 	}
-
 	# two-way interactions
-	if(Mg2 > 0){
+	if(Mg2 > 0 &  D > 1){
 		# empty list
 		bivG0 <- vector(mode="list",length=Mg2)
 		# all two-way column combinations
-		comb <- combn(Mg1,2)
+		comb <- combn(D,2)
 		# randomly sample Mg2 two-way interactions without replacement 
-		combCols <- sample(1:ncol(comb),Mg2)
+		combCols <- sample(1:ncol(comb),Mg2,replace = TRUE)
 		for(m in 1:Mg2){
 			# the two columns used for this interaction
 			theseCols <- comb[,combCols[m]]
@@ -190,13 +222,13 @@ makeRandomData <- function(n,
 	}
 
 	#trivariate
-	if(Mg3 > 0){
+	if(Mg3 > 0 & D > 2){
 		# empty list
 		triG0 <- vector(mode="list",length=Mg3)
 		# all three way choices of columns
-		comb <- combn(Mg1,3)
+		comb <- combn(D, 3)
 		# randomly sample Mg3 three-way interactions without replacement 
-		combCols <- sample(1:ncol(comb),Mg3)
+		combCols <- sample(1:ncol(comb),Mg3,replace = TRUE)
 		for(m in 1:Mg3){
 			# the three columns used for this function
 			theseCols <- comb[,combCols[m]]
@@ -214,14 +246,41 @@ makeRandomData <- function(n,
 	}else{
 		triG0 <- NULL
 	}
+	# quadravariate
+	if(Mg4 > 0 & D > 3){
+		# empty list
+		quadG0 <- vector(mode="list",length=Mg4)
+		# all four way choices of columns
+		comb <- combn(D, 4)
+		# randomly sample Mg3 four-way interactions without replacement 
+		combCols <- sample(1:ncol(comb), Mg4, replace = TRUE)
+		for(m in 1:Mg4){
+			# the four columns used for this function
+			theseCols <- comb[,combCols[m]]
+			# the random function to be used
+			thisF <- sample(funcG0.quad, 1)
+			# get parameters for function
+			thisParm <- do.call(paste0(thisF,"Parm"), 
+			                    args = list(x1 = W[,theseCols[1]], 
+			                    x2 = W[,theseCols[2]], x3=W[,theseCols[3]],
+			                    x4 = W[,theseCols[4]]))
+			# call function with parameters
+			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], 
+			                                     x2 = W[,theseCols[2]], 
+			                                     x3 = W[,theseCols[3]],
+			                                     x4 = W[,theseCols[4]]),thisParm))
+			# save output in list
+			quadG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
+			# add to current logitg0
+			logitg0 <- logitg0 + fOut
+		}
+	}else{
+		quadG0 <- NULL
+	}
 
 	# correct for positivity violations
-	iter <- 0
-	while(min(plogis(logitg0)) < minG0){
-		iter <- iter + 1
-		logitg0 <- logitg0/1.01^iter
-	}
-	divideLogitG0 <- 1.01^iter
+	logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
+	logitg0[plogis(logitg0) > 1 - minG0] <- qlogis(1 - minG0)
 
 	# simulate A
 	A <- rbinom(n, 1, plogis(logitg0))
@@ -232,40 +291,46 @@ makeRandomData <- function(n,
 	#----------------------------------------------------------------------
 	# Simulate Y
 	#----------------------------------------------------------------------
-	# draw random number of main terms between 2 and D + 1, where we set 
-	# 2 to be the minimum so that we ensure there is confounding. 
-	MQ1 <- round(runif(1, 1.5, D + 1.5))
+	# draw random number of main terms between 0 and D + 1, where we set 
+	# no minimum, which allows there to be cases of just pure noise
+	MQ1 <- round(runif(1, -0.5, D + 1.5))
 
 	# draw random number of interaction terms
-	MQ2 <- ifelse(MQ1 > 1, round(runif(1, 0.5, MQ1 - 0.5)), 0)
-	MQ3 <- ifelse(MQ2 > 1, round(runif(1, 0.5, MQ2 - 0.5)), 0)
+	MQ2 <- round(runif(1, -0.5, D + 1.5))
+	MQ3 <- round(runif(1, -0.5, D + 1.5))
+	MQ4 <- round(runif(1, -0.5, D + 1.5))
 	
 	# empty 
 	Q0 <- rep(0, n)
 
 	# main terms
 	# empty
-	uniQ0 <- vector(mode="list", length = MQ1)
-	for(m in 1:MQ1){
-		# randomly draw function
-		thisF <- sample(funcQ0.uni, 1)
-		# get parameters
-		thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = AW[,m]))
-		# call function with parameters
-		fOut <- do.call(thisF, args = c(list(x = AW[,m]), thisParm))
-		# save results
-		uniQ0[[m]] <- list(fn = thisF, parm = thisParm)
-		# add 
-		Q0 <- Q0 + fOut
+	if(MQ1 > 0){
+		uniQ0 <- vector(mode="list", length = MQ1)
+		for(m in 1:MQ1){
+			# randomly draw function
+			thisF <- sample(funcQ0.uni, 1)
+			# randomly draw column of AW
+			awCol <- sample(1:ncol(AW), 1)
+			# get parameters
+			thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = AW[,awCol]))
+			# call function with parameters
+			fOut <- do.call(thisF, args = c(list(x = AW[,awCol]), thisParm))
+			# save results
+			uniQ0[[m]] <- list(fn = thisF, parm = thisParm, whichColsAW = awCol)
+			# add 
+			Q0 <- Q0 + fOut
+		}
+	}else{
+		uniQ0 <- NULL
 	}
-
 	# two-way interactions
 	if(MQ2 > 0){
 		bivQ0 <- vector(mode="list",length=MQ2)
 		# all combinations of columns
-		comb <- combn(MQ1,2)
+		comb <- combn(D+1,2)
 		# randomly sample columns
-		combCols <- sample(1:ncol(comb),MQ2)
+		combCols <- sample(1:ncol(comb),MQ2, replace = TRUE)
 		for(m in 1:MQ2){
 			# what columns to use for this interaction
 			theseCols <- comb[,combCols[m]]
@@ -285,13 +350,13 @@ makeRandomData <- function(n,
 	}
 
 	# three-way interactions 
-	if(MQ3 > 0){
+	if(MQ3 > 0 & D > 1){
 		# empty
 		triQ0 <- vector(mode="list",length=MQ3)
 		# all three-way column combinations
-		comb <- combn(MQ1,3)
+		comb <- combn(D+1,3)
 		# randomly sample three choices of combinations without replacement
-		combCols <- sample(1:ncol(comb),MQ3)
+		combCols <- sample(1:ncol(comb),MQ3, replace = TRUE)
 		for(m in 1:MQ3){
 			# columns to use for this interaction
 			theseCols <- comb[,combCols[m]]
@@ -309,6 +374,38 @@ makeRandomData <- function(n,
 	}else{
 		triQ0 <- NULL
 	}
+	# four-way interactions 
+	if(MQ4 > 0 & D > 2){
+		# empty
+		quadQ0 <- vector(mode="list",length=MQ4)
+		# all four-way column combinations
+		comb <- combn(D+1, 4)
+		# randomly sample four choices of combinations without replacement
+		combCols <- sample(1:ncol(comb), MQ4, replace = TRUE)
+		for(m in 1:MQ4){
+			# columns to use for this interaction
+			theseCols <- comb[,combCols[m]]
+			# randomly sample function
+			thisF <- sample(funcQ0.quad,1)
+			# get parameters 
+			thisParm <- do.call(paste0(thisF,"Parm"), 
+			                    args = list(x1 = AW[,theseCols[1]], 
+			                                x2 = AW[,theseCols[2]], 
+			                                x3=AW[,theseCols[3]],
+			                                x4=AW[,theseCols[4]]))
+			# call function with parameters
+			fOut <- do.call(thisF, args = c(list(x1 = AW[,theseCols[1]], 
+			                                     x2 = AW[,theseCols[2]], 
+			                                     x3=AW[,theseCols[3]],
+			                                     x4=AW[,theseCols[4]]),thisParm))
+			# save output
+			quadQ0[[m]] <- list(fn = thisF, parm = thisParm, whichColsAW = theseCols)
+			# add
+			Q0 <- Q0 + fOut
+		}
+	}else{
+		quadQ0 <- NULL
+	}
 
 
 	# Drawing an error function
@@ -317,19 +414,37 @@ makeRandomData <- function(n,
 	# randomly draw error function
 	errFn <- sample(errY, 1)
 	# get parameters of error function
-	errParm <- do.call(paste0(errFn, "Parm"), args = list())
+	errParm <- do.call(paste0(errFn, "Parm"), args = list(AW = AW))
 	# evaluate error function
-	errOut <- do.call(errFn, args = c(list(W=W, n=n), errParm))
+	errOut <- do.call(errFn, args = c(list(AW=AW, n=n), errParm))
 	# save output
 	errYList$fn <- errFn; errYList$parm <- errParm
 
-	# compute Y
-	Y <- Q0 + errOut
+	# make sure R2 is falling in proper range
+	ct <- 0
+	currR2 <- Inf
+	while(currR2 < minR2 | currR2 > maxR2){
+		ct <- ct + 1
+		if(currR2 > maxR2){
+			mult <- 1.05^ct
+		}else if(currR2 < minR2){
+			mult <- 1/1.05^ct
+		}
+		# compute Y
+		Y <- Q0 + errOut
+		out <- list(W = W, A = data.frame(A=A), Y = data.frame(Y=Y), distW = distW,
+					minG0 = minG0, minR2 = minR2, maxR2 = maxR2,
+		            fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0, quad = quadG0),
+			        fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0, quad = quadQ0), distErrY = errYList, 
+			        Q0 = Q0, g0 = plogis(logitg0), errMult = mult, funcG0.uni = funcG0.uni, funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri, funcG0.quad = funcG0.quad,
+			        funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri, funcQ0.quad = funcQ0.quad)
+		class(out) <- "makeRandomData"
 
-	out <- list(W = W, A = data.frame(A=A), Y = data.frame(Y=Y), distW = distW, fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0),
-		            fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0), distErrY = errYList, divideLogitG0 = divideLogitG0,
-		            Q0 = Q0, g0 = plogis(logitg0), funcG0.uni = funcG0.uni, funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri,
-		            funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri)
-	class(out) <- "makeRandomData"
+		# get summary 
+		bigObs <- remakeRandomData(n = 1e5, object = out)
+		currR2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
+		# cat("Current R2 = ", currR2)
+	}
+
 	return(out)
 }

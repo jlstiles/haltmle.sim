@@ -4,7 +4,7 @@
 \alias{linUniParm}
 \title{linUniParm}
 \usage{
-linUniParm(coefLower = -2, coefUpper = 2, ...)
+linUniParm(coefLower = -10, coefUpper = 10, ...)
 }
 \description{
 Draw random coefficient for linear univariate relationship

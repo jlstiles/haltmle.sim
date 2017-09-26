@@ -25,22 +25,22 @@ if(length(args) < 1){
 }
 
 # install haltmle.sim 
-withr::with_libpaths("~/R packages",{
-  install_github("benkeser/haltmle.sim"))
-  install_github("benkeser/modifySL")
-  install_github("benkeser/drtmle")
-  # load packages
+# withr::with_libpaths("~/R packages",{
+  # install_github("benkeser/haltmle.sim")
+  # install_github("benkeser/modifySL")
+  # install_github("benkeser/drtmle")
+  # # load packages
   library(modifySL)
   library(haltmle.sim)
   library(drtmle)
-})
+# })
 
 # for hc_tmle
 source("~/hc/sim/healthcosts.R")
 
 # parameters
-ns <- c(100,500,1000,2000)
-bigB <- 6001:8000
+ns <- c(4000)
+bigB <- 1:10000
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
@@ -115,7 +115,8 @@ if (args[1] == 'run') {
     fullSL <- SuperLearner(Y=dat$Y$Y,X=X,family=gaussian(), SL.library=algo,
                                    verbose=TRUE,method="method.NNLS")
     # modify SL to drop HAL
-    dropSL <- modifySL::modifySL(fit = fullSL, Y = dat$Y$Y, newLibrary = fullSL$libraryNames[-(length(algo))])
+    dropSL <- modifySL::modifySL(fit = fullSL, Y = dat$Y$Y, 
+                                 newLibrary = fullSL$libraryNames[-(length(algo))])
 
     ## get inference
     X1 <- X0 <- X
@@ -124,47 +125,47 @@ if (args[1] == 'run') {
     outFull <- hc.tmle(Y=dat$Y$Y,X=X,X0=X0,X1=X1,fm=fullSL,onlySL=FALSE,trt="A")
     outDrop <- hc.tmle(Y=dat$Y$Y,X=X,X0=X0,X1=X1,fm=dropSL,onlySL=TRUE,trt="A")
     out <- list(outFull, outDrop)
-    save(out, file=paste0(saveDir,"drawOut_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
+    save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
     }
 }
 
 # merge job ###########################
 if (args[1] == 'merge') {
-  n <- sum <- slFull <- slDrop <- cand <- NULL
-  # get summary
+  # n <- sum <- slFull <- slDrop <- cand <- NULL
+  # # get summary
 
-  # load all files in saveDir
-  allf <- list.files(saveDir)
-  fullf <- allf[grep("Full",allf)]
-  for(i in 1:length(allf)){
-    if(i %% 100 == 0){ cat(i,"\n") }
-    out <- get(load(paste0(saveDir,allf[i])))
-    tmp <- strsplit(allf[i], "=")
-    n <- c(n, as.numeric(strsplit(tmp[[1]][2],"_seed")[[1]][1]))
-    slFull <- rbind(slFull, out[[1]][[1]]$diff)
-    slDrop <- rbind(slDrop, out[[2]][[1]]$diff)
-    cand <- rbind(cand, Reduce(c, lapply(out[[1]][[3]], function(x){x$diff})))
+  # # load all files in saveDir
+  # allf <- list.files(saveDir)
+  # fullf <- allf[grep("Full",allf)]
+  # for(i in 1:length(allf)){
+  #   if(i %% 100 == 0){ cat(i,"\n") }
+  #   out <- get(load(paste0(saveDir,allf[i])))
+  #   tmp <- strsplit(allf[i], "=")
+  #   n <- c(n, as.numeric(strsplit(tmp[[1]][2],"_seed")[[1]][1]))
+  #   slFull <- rbind(slFull, out[[1]][[1]]$diff)
+  #   slDrop <- rbind(slDrop, out[[2]][[1]]$diff)
+  #   cand <- rbind(cand, Reduce(c, lapply(out[[1]][[3]], function(x){x$diff})))
 
-    # count outliers in data set
-    dat <- get(load(paste0(scratchDir,gsub("drawOut","draw",allf[i]))))          
-    tmp <- summary(dat)
-    sum <- rbind(sum, unlist(tmp))
-  }
-  algo <- c("SL.glm","SL.bayesglm", 
-            "SL.earth",
-            "SL.stepAIC","SL.step",
-            "SL.step.forward", "SL.step.interaction",
-            "SL.gam", "SL.gbm.caret1", "SL.randomForest.caret1",
-            "SL.svmLinear.caret1",
-            "SL.nnet.caret1",
-            "SL.rpart.caret1", "SL.mean","SL.hal")
+  #   # count outliers in data set
+  #   dat <- get(load(paste0(scratchDir,gsub("drawOut","draw",allf[i]))))          
+  #   tmp <- haltmle.sim:::summary.makeRandomData(dat)
+  #   sum <- rbind(sum, unlist(tmp))
+  # }
+  # algo <- c("SL.glm","SL.bayesglm", 
+  #           "SL.earth",
+  #           "SL.stepAIC","SL.step",
+  #           "SL.step.forward", "SL.step.interaction",
+  #           "SL.gam", "SL.gbm.caret1", "SL.randomForest.caret1",
+  #           "SL.svmLinear.caret1",
+  #           "SL.nnet.caret1",
+  #           "SL.rpart.caret1", "SL.mean","SL.hal")
   
-  allOut <- data.frame(n, slFull, slDrop, cand, sum)
-  names(allOut) <- c("n",paste0("slFull.",c("est","cil","ciu")),
-                  paste0("slDrop.",c("est","cil","ciu")), 
-                  outer(algo,c(".est",".cil",".ciu"), FUN=paste0),
-                  names(unlist(tmp)))
-  save(allOut, file=paste0(saveDir,"allOut.RData"))
+  # allOut <- data.frame(n, slFull, slDrop, cand, sum)
+  # names(allOut) <- c("n",paste0("slFull.",c("est","cil","ciu")),
+  #                 paste0("slDrop.",c("est","cil","ciu")), 
+  #                 outer(algo,c(".est",".cil",".ciu"), FUN=paste0),
+  #                 names(unlist(tmp)))
+  # save(allOut, file=paste0(saveDir,"allOut.RData"))
 }
 
 
