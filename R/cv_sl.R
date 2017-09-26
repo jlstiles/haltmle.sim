@@ -424,8 +424,10 @@ logistic_tmle <- function(Y, W, A, Qbar, g, gtol = 1e-2){
 	offset <- trim_qlogis(Qbar_scale$QAW)
 	fluc_dat <- data.frame(out = as.numeric(Y_scale), 
 	                       off = offset, covar = as.numeric(HAW))
+  suppressWarnings(
 	fm <- glm(out ~ -1 + offset(off) + covar, family = binomial(),
 	          data = fluc_dat)
+  )
 	pred_A1_dat <- data.frame(out = as.numeric(Y_scale),
 	                          off = trim_qlogis(Qbar_scale$Q1W), 
 	                          covar = 1/g$g1W)
@@ -454,9 +456,9 @@ linear_tmle <- function(Y, W, A, Qbar, g, gtol = 1e-2){
 	          data = fluc_dat_0, weights = HAW_0)
 
 	pred_A1_dat <- data.frame(out = as.numeric(Y),
-	                          off = Qbar_scale$Q1W)
+	                          off = Qba$Q1W)
 	pred_A0_dat <- data.frame(out = as.numeric(Y),
-	                          off = Qbar_scale$Q0W)
+	                          off = Qbar$Q0W)
 	Q1W_star <- predict(fm_1, newdata = pred_A1_dat, type = "response")
 	Q0W_star <- predict(fm_0, newdata = pred_A0_dat, type = "response")
 	QAW_star <- ifelse(A==1, Q1W_star, Q0W_star)
