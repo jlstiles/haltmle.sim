@@ -38,17 +38,22 @@ if(length(args) < 1){
 # for hc_tmle
 # source("~/hc/sim/healthcosts.R")
 
-# parameters
-ns <- c(200, 1000, 5000)
-bigB <- 1:10000
+# full parm
+# ns <- c(200, 1000, 5000)
+ns <- c(200)
+min_R2 <- c(0.01, seq(0.101, 0.901, by = 0.1))
+max_R2 <- c(seq(0.1,0.9,0.1),0.99)
+mat_R2 <- cbind(min_R2, max_R2)
+bigB <- 2500
+
+# # simulation parameters
+parm <- expand.grid(seed=1:bigB,
+                    n=ns,
+                    range_R2 = split(mat_R2, row(mat_R2)))
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
 scratchDir <- "~/haltmle.sim/scratch/"
-
-# # simulation parameters
-parm <- expand.grid(seed=bigB,
-                    n=ns)
 
 # get the list size #########
 if (args[1] == 'listsize') {
@@ -59,7 +64,9 @@ if (args[1] == 'listsize') {
 if (args[1] == 'prepare') {
   for(i in 1:nrow(parm)){
     set.seed(parm$seed[i])
-    dat <- haltmle.sim:::makeRandomData(n=parm$n[i], maxD = 8)
+    dat <- haltmle.sim:::makeRandomData(n=parm$n[i], maxD = 8,
+                                        minR2 = parm$range_R2[[i]][1],
+                                        maxR2 = parm$range_R2[[i]][2])
     save(dat, file=paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
   }
   print(paste0('initial datasets saved to: ', scratchDir))
@@ -87,7 +94,9 @@ if (args[1] == 'run') {
     library(SuperLearner)
     library(caret)
     
-    algo <- c("SL.hal9001","SL.glm","SL.bayesglm", 
+    algo <- c("SL.hal9001",
+              "SL.glm",
+              "SL.bayesglm", 
               "SL.earth",
               "SL.step.interaction",
               "SL.gam", 
@@ -95,16 +104,19 @@ if (args[1] == 'run') {
               "SL.gbm.caretMod",
               "SL.rf.caretMod",
               "SL.rpart.caretMod", 
-              "SL.mean")
+              "SL.mean",
+              "SL.kernelKnn")
         
     # fit super learner with all algorithms
     set.seed(parm$seed[i])
     dat$W <- data.frame(dat$W)
     colnames(dat$W) <- paste0("W",1:ncol(dat$W))
-    out <- haltmle.sim:::get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 3, learners = algo[c(2:3)], remove_learner = NULL)
-
-    save(out, file=paste0(saveDir,"drawOut_V2_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
+    system.time(
+    out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
+                        V = 10, learners = algo, remove_learner = NULL)
+    )
+    save(out, file=paste0(saveDir,"out_n=",parm$n[i],"_seed=",parm$seed[i],
+                          "_r2="parm$range_R2[[i]][1],".RData"))
     }
 }
 

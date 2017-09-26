@@ -4,7 +4,7 @@
 \alias{plot.makeRandomData}
 \title{plot.makeRandomData}
 \usage{
-plot.makeRandomData(object, g0 = TRUE, Q0 = TRUE, ask = FALSE,
+\method{plot}{makeRandomData}(object, g0 = TRUE, Q0 = TRUE, ask = FALSE,
   addMain = TRUE, nPoints = 1000, quantProbs = c(0.25, 0.75), nrow = 3,
   ncol = 2, layOutNum = 1:(nrow * ncol), legLoc = "topleft")
 }

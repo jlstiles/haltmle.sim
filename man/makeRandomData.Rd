@@ -4,9 +4,9 @@
 \alias{makeRandomData}
 \title{makeRandomData}
 \usage{
-makeRandomData(n, maxD, func.distW = c("uniformW", "normalW", "bernoulliW",
-  "binomialW", "gammaW", "normalWCor", "bernoulliWCor", "uniformWCor",
-  "gammaPointMassW", "binomialFracW", "normalPointMassW"),
+makeRandomData(n, maxD, minObsA = 10, func.distW = c("uniformW", "normalW",
+  "bernoulliW", "binomialW", "gammaW", "normalWCor", "bernoulliWCor",
+  "uniformWCor", "gammaPointMassW", "binomialFracW", "normalPointMassW"),
   funcG0.uni = c("linUni", "polyUni", "sinUni", "jumpUni", "pLogisUni",
   "dNormUni", "qGammaUni", "dNormMixUni", "cubicSplineUni", "linSplineUni"),
   funcG0.biv = c("linBiv", "polyBiv", "sinBiv", "jumpBiv", "dNormAddBiv",

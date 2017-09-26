@@ -86,7 +86,8 @@
 #' @export
 
 makeRandomData <- function(n, 
-                           maxD,  
+                           maxD,
+                           minObsA = 10,  
                            func.distW = c("uniformW","normalW","bernoulliW","binomialW","gammaW",
                                      "normalWCor","bernoulliWCor","uniformWCor", "gammaPointMassW",
                                      "binomialFracW","normalPointMassW"), 
@@ -175,116 +176,119 @@ makeRandomData <- function(n,
 	# initialize empty
 	logitg0 <- rep(0, n)
 
-	# univariate
-	if(Mg1 > 0){
-		uniG0 <- vector(mode="list", length = Mg1)
-		for(m in 1:Mg1){
-			# draw random function
-			thisF <- sample(funcG0.uni, 1)
-			# draw random column of W
-			wCol <- sample(1:ncol(W), 1)
-			# get parameters
-			thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = W[,wCol]))
-			# call function with parameters 
-			fOut <- do.call(thisF, args = c(list(x = W[,wCol]), thisParm))
-			# save output in list
-			uniG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = wCol)
-			# add to current logitg0
-			logitg0 <- logitg0 + fOut
+	# make sure there are at least some A in each group
+	A <- rep(0, n)
+	while(sum(A == 1) < minObsA | sum(A==0) < minObsA){
+		# univariate
+		if(Mg1 > 0){
+			uniG0 <- vector(mode="list", length = Mg1)
+			for(m in 1:Mg1){
+				# draw random function
+				thisF <- sample(funcG0.uni, 1)
+				# draw random column of W
+				wCol <- sample(1:ncol(W), 1)
+				# get parameters
+				thisParm <- do.call(paste0(thisF,"Parm"), args = list(x = W[,wCol]))
+				# call function with parameters 
+				fOut <- do.call(thisF, args = c(list(x = W[,wCol]), thisParm))
+				# save output in list
+				uniG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = wCol)
+				# add to current logitg0
+				logitg0 <- logitg0 + fOut
+			}
+		}else{
+			uniG0 <- NULL
 		}
-	}else{
-		uniG0 <- NULL
-	}
-	# two-way interactions
-	if(Mg2 > 0 &  D > 1){
-		# empty list
-		bivG0 <- vector(mode="list",length=Mg2)
-		# all two-way column combinations
-		comb <- combn(D,2)
-		# randomly sample Mg2 two-way interactions without replacement 
-		combCols <- sample(1:ncol(comb),Mg2,replace = TRUE)
-		for(m in 1:Mg2){
-			# the two columns used for this interaction
-			theseCols <- comb[,combCols[m]]
-			# the random function to be used
-			thisF <- sample(funcG0.biv, 1)
-			# get parameters for function
-			thisParm <- do.call(paste0(thisF,"Parm"), args = list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]]))
-			# call function with parameters
-			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]]),thisParm))
-			# save output in list
-			bivG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
-			# add to current logitg0
-			logitg0 <- logitg0 + fOut
+		# two-way interactions
+		if(Mg2 > 0 &  D > 1){
+			# empty list
+			bivG0 <- vector(mode="list",length=Mg2)
+			# all two-way column combinations
+			comb <- combn(D,2)
+			# randomly sample Mg2 two-way interactions without replacement 
+			combCols <- sample(1:ncol(comb),Mg2,replace = TRUE)
+			for(m in 1:Mg2){
+				# the two columns used for this interaction
+				theseCols <- comb[,combCols[m]]
+				# the random function to be used
+				thisF <- sample(funcG0.biv, 1)
+				# get parameters for function
+				thisParm <- do.call(paste0(thisF,"Parm"), args = list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]]))
+				# call function with parameters
+				fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]]),thisParm))
+				# save output in list
+				bivG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
+				# add to current logitg0
+				logitg0 <- logitg0 + fOut
+			}
+		}else{
+			bivG0 <- NULL
 		}
-	}else{
-		bivG0 <- NULL
-	}
 
-	#trivariate
-	if(Mg3 > 0 & D > 2){
-		# empty list
-		triG0 <- vector(mode="list",length=Mg3)
-		# all three way choices of columns
-		comb <- combn(D, 3)
-		# randomly sample Mg3 three-way interactions without replacement 
-		combCols <- sample(1:ncol(comb),Mg3,replace = TRUE)
-		for(m in 1:Mg3){
-			# the three columns used for this function
-			theseCols <- comb[,combCols[m]]
-			# the random function to be used
-			thisF <- sample(funcG0.tri, 1)
-			# get parameters for function
-			thisParm <- do.call(paste0(thisF,"Parm"), args = list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]], x3=W[,theseCols[3]]))
-			# call function with parameters
-			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]], x3=W[,theseCols[3]]),thisParm))
-			# save output in list
-			triG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
-			# add to current logitg0
-			logitg0 <- logitg0 + fOut
+		#trivariate
+		if(Mg3 > 0 & D > 2){
+			# empty list
+			triG0 <- vector(mode="list",length=Mg3)
+			# all three way choices of columns
+			comb <- combn(D, 3)
+			# randomly sample Mg3 three-way interactions without replacement 
+			combCols <- sample(1:ncol(comb),Mg3,replace = TRUE)
+			for(m in 1:Mg3){
+				# the three columns used for this function
+				theseCols <- comb[,combCols[m]]
+				# the random function to be used
+				thisF <- sample(funcG0.tri, 1)
+				# get parameters for function
+				thisParm <- do.call(paste0(thisF,"Parm"), args = list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]], x3=W[,theseCols[3]]))
+				# call function with parameters
+				fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], x2 = W[,theseCols[2]], x3=W[,theseCols[3]]),thisParm))
+				# save output in list
+				triG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
+				# add to current logitg0
+				logitg0 <- logitg0 + fOut
+			}
+		}else{
+			triG0 <- NULL
 		}
-	}else{
-		triG0 <- NULL
-	}
-	# quadravariate
-	if(Mg4 > 0 & D > 3){
-		# empty list
-		quadG0 <- vector(mode="list",length=Mg4)
-		# all four way choices of columns
-		comb <- combn(D, 4)
-		# randomly sample Mg3 four-way interactions without replacement 
-		combCols <- sample(1:ncol(comb), Mg4, replace = TRUE)
-		for(m in 1:Mg4){
-			# the four columns used for this function
-			theseCols <- comb[,combCols[m]]
-			# the random function to be used
-			thisF <- sample(funcG0.quad, 1)
-			# get parameters for function
-			thisParm <- do.call(paste0(thisF,"Parm"), 
-			                    args = list(x1 = W[,theseCols[1]], 
-			                    x2 = W[,theseCols[2]], x3=W[,theseCols[3]],
-			                    x4 = W[,theseCols[4]]))
-			# call function with parameters
-			fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], 
-			                                     x2 = W[,theseCols[2]], 
-			                                     x3 = W[,theseCols[3]],
-			                                     x4 = W[,theseCols[4]]),thisParm))
-			# save output in list
-			quadG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
-			# add to current logitg0
-			logitg0 <- logitg0 + fOut
+		# quadravariate
+		if(Mg4 > 0 & D > 3){
+			# empty list
+			quadG0 <- vector(mode="list",length=Mg4)
+			# all four way choices of columns
+			comb <- combn(D, 4)
+			# randomly sample Mg3 four-way interactions without replacement 
+			combCols <- sample(1:ncol(comb), Mg4, replace = TRUE)
+			for(m in 1:Mg4){
+				# the four columns used for this function
+				theseCols <- comb[,combCols[m]]
+				# the random function to be used
+				thisF <- sample(funcG0.quad, 1)
+				# get parameters for function
+				thisParm <- do.call(paste0(thisF,"Parm"), 
+				                    args = list(x1 = W[,theseCols[1]], 
+				                    x2 = W[,theseCols[2]], x3=W[,theseCols[3]],
+				                    x4 = W[,theseCols[4]]))
+				# call function with parameters
+				fOut <- do.call(thisF, args = c(list(x1 = W[,theseCols[1]], 
+				                                     x2 = W[,theseCols[2]], 
+				                                     x3 = W[,theseCols[3]],
+				                                     x4 = W[,theseCols[4]]),thisParm))
+				# save output in list
+				quadG0[[m]] <- list(fn = thisF, parm = thisParm, whichColsW = theseCols)
+				# add to current logitg0
+				logitg0 <- logitg0 + fOut
+			}
+		}else{
+			quadG0 <- NULL
 		}
-	}else{
-		quadG0 <- NULL
+
+		# correct for positivity violations
+		logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
+		logitg0[plogis(logitg0) > 1 - minG0] <- qlogis(1 - minG0)
+
+		# simulate A
+		A <- rbinom(n, 1, plogis(logitg0))
 	}
-
-	# correct for positivity violations
-	logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
-	logitg0[plogis(logitg0) > 1 - minG0] <- qlogis(1 - minG0)
-
-	# simulate A
-	A <- rbinom(n, 1, plogis(logitg0))
-
 	# matrix with A and W
 	AW <- cbind(A, W)
 
