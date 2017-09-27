@@ -519,12 +519,15 @@ get_dr_tmle <- function(W, A, Y, Q, g, folds, est_name, ...){
   dr_fit <- drtmle(W = W, A = A, Y = Y, Qn = Qn, gn = gn,
                    a_0 = c(0,1), maxIter = 5, cvFolds = cvFolds, 
                    SL_Qr = "SL.hal9001", SL_gr = "SL.hal9001",
-                   verbose = TRUE)
+                   verbose = FALSE)
 
+  ci_dr_fit <- ci(dr_fit, contrast = c(-1,1))
+  est <- ci_dr_fit$drtmle[1,1]
+  se <- (ci_dr_fit$drtmle[1,1] - ci_dr_fit$drtmle[1,2])/qnorm(0.975)
 
-
-
+  return(list(est = est, se = se))
 }
+
 #' @export
 get_all_ates <- function(Y, W, A, V = 5, learners, 
                               remove_learner = NULL, gtol = 1e-3, 
@@ -539,7 +542,9 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
                                    weight_fn = "weight_sl_convex",
                                    cv_risk_fn = "cv_risk_sl_r2",
                                    family = binomial(),
-                                   alpha = 0.05)){
+                                   alpha = 0.05),
+                      which_dr_tmle = c("full_sl","cv_full_sl",
+                                        "SL.hal9001","cv_SL.hal9001")){
 	# estimate nuisance
 	nuisance <- estimate_nuisance(Y = Y, W = W, A = A, V = V, learners = learners,
 	                              remove_learner = remove_learner, 
@@ -588,11 +593,15 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
 	                                FUN = c, SIMPLIFY = FALSE)
 
   # get dr inference TMLEs
-  dr_tmle
-
+  dr_tmle_results <- mapply(Q = nuisance$Qbar[which_dr_tmle], g = nuisance$g[which_dr_tmle], 
+                    est_name = split(which_dr_tmle, 1:length(which_dr_tmle)),
+                    get_dr_tmle,
+                    MoreArgs = list(folds = nuisance$folds, W = W, A = A, Y = Y),
+                    SIMPLIFY = FALSE)
 
 	return(list(logistic_tmle = logistic_tmle_results,
 	            linear_tmle = linear_tmle_results,
-	            onestep = onestep_results))
+	            onestep = onestep_results,
+              dr_tmle = dr_tmle_results))
 }
 

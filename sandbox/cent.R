@@ -103,8 +103,11 @@ if (args[1] == 'run') {
     set.seed(parm$seed[i])
     dat$W <- data.frame(dat$W)
     colnames(dat$W) <- paste0("W",1:ncol(dat$W))
+
+    # !!!!! NEED A SAFETY NET FOR FEW OBSERVED A VALUES FOR DRTMLE !!!!! #
+    # !!!!! Could using SL.glm if fewer than a certain number of A's? !! #
     out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 3, learners = algo[1:2], remove_learner = NULL)
+                        V = 5, learners = algo[2:3], remove_learner = NULL)
 
     save(out, file=paste0(saveDir,"out_n=",parm$n[i],"_seed=",parm$seed[i],
                           "_r2="parm$range_R2[[i]][1],".RData"))

@@ -87,7 +87,7 @@
 
 makeRandomData <- function(n, 
                            maxD,
-                           minObsA = 10,  
+                           minObsA = 30,  
                            func.distW = c("uniformW","normalW","bernoulliW","binomialW","gammaW",
                                      "normalWCor","bernoulliWCor","uniformWCor", "gammaPointMassW",
                                      "binomialFracW","normalPointMassW"), 
