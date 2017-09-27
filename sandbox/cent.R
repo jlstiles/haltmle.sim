@@ -24,19 +24,13 @@ if(length(args) < 1){
   stop("Not enough arguments. Please use args 'listsize', 'prepare', 'run <itemsize>' or 'merge'")
 }
 
-# install haltmle.sim 
-# withr::with_libpaths("~/R packages",{
-  # install_github("benkeser/haltmle.sim")
-  # install_github("benkeser/modifySL")
-  # install_github("benkeser/drtmle")
-  # # load packages
-  library(haltmle.sim, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
-  library(cvma, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
-  library(hal9001, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
-# })
-
-# for hc_tmle
-# source("~/hc/sim/healthcosts.R")
+# # load packages
+library(haltmle.sim, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+library(cvma, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+library(hal9001, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
+library(SuperLearner)
+library(caret)
 
 # full parm
 # ns <- c(200, 1000, 5000)
@@ -67,7 +61,8 @@ if (args[1] == 'prepare') {
     dat <- haltmle.sim:::makeRandomData(n=parm$n[i], maxD = 8,
                                         minR2 = parm$range_R2[[i]][1],
                                         maxR2 = parm$range_R2[[i]][2])
-    save(dat, file=paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
+    save(dat, file=paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],
+                          "_r2=",parm$range_R2[[i]][1],".RData"))
   }
   print(paste0('initial datasets saved to: ', scratchDir))
 }
@@ -88,11 +83,8 @@ if (args[1] == 'run') {
     print(parm[i,])
     
     # load data
-    load(paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],".RData"))
-    
-    # load libraries
-    library(SuperLearner)
-    library(caret)
+    load(paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],
+                          "_r2=",parm$range_R2[[i]][1],".RData"))
     
     algo <- c("SL.hal9001",
               "SL.glm",
@@ -111,10 +103,9 @@ if (args[1] == 'run') {
     set.seed(parm$seed[i])
     dat$W <- data.frame(dat$W)
     colnames(dat$W) <- paste0("W",1:ncol(dat$W))
-    system.time(
     out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 10, learners = algo, remove_learner = NULL)
-    )
+                        V = 3, learners = algo[1:2], remove_learner = NULL)
+
     save(out, file=paste0(saveDir,"out_n=",parm$n[i],"_seed=",parm$seed[i],
                           "_r2="parm$range_R2[[i]][1],".RData"))
     }

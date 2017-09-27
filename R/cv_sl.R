@@ -411,7 +411,7 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
     	                                                  g0W = 1 - cv_pred$cv_learner_pred[ , i])
     }
 
-    return(list(Qbar = Qbar_list, g = g_list))
+    return(list(Qbar = Qbar_list, g = g_list, folds = folds))
 }
 
 # @param Qbar a data.frame with names QAW, Q1W, Q0W 
@@ -501,6 +501,30 @@ trim_qlogis <- function(x, trim = 1e-5){
 	qlogis(x)
 }
 
+#' Get drtmles from output of estimate nuisance
+# @param Q The outcome regression formatted as output of estimate_nuisance
+# @param g The propensity regression formatted as output of estimate_nuisance
+get_dr_tmle <- function(W, A, Y, Q, g, folds, est_name, ...){
+  Qn <- list(Q$Q0W, Q$Q1W)
+  gn <- list(g$g0W, g$g1W)
+  # if it's a cv estimate of nuisance, then pass in
+  # the folds used to estimate
+  if(grepl("cv", est_name)){
+    cvFolds <- folds
+  }else{
+    # otherwise, don't use cv to estimate extra nuisance
+    cvFolds <- 1
+  }
+
+  dr_fit <- drtmle(W = W, A = A, Y = Y, Qn = Qn, gn = gn,
+                   a_0 = c(0,1), maxIter = 5, cvFolds = cvFolds, 
+                   SL_Qr = "SL.hal9001", SL_gr = "SL.hal9001",
+                   verbose = TRUE)
+
+
+
+
+}
 #' @export
 get_all_ates <- function(Y, W, A, V = 5, learners, 
                               remove_learner = NULL, gtol = 1e-3, 
@@ -562,6 +586,10 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
 	                                FUN = c, SIMPLIFY = FALSE)
 	onestep_results <- mapply(est = onestep_ate, se = onestep_se, 
 	                                FUN = c, SIMPLIFY = FALSE)
+
+  # get dr inference TMLEs
+  dr_tmle
+
 
 	return(list(logistic_tmle = logistic_tmle_results,
 	            linear_tmle = linear_tmle_results,

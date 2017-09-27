@@ -1,7 +1,7 @@
 #-----------------------------------------
 # commands for scp'ing sce and cent over
 #-----------------------------------------
-cd ~/Dropbox/R/haltmle.sim/tests
+cd ~/Dropbox/R/haltmle.sim/sandbox
 scp  cent.R sce.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 # scp mergeOnly.R subMerge.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 

@@ -430,9 +430,9 @@ makeRandomData <- function(n,
 	while(currR2 < minR2 | currR2 > maxR2){
 		ct <- ct + 1
 		if(currR2 > maxR2){
-			mult <- 1.05^ct
+			mult <- 1.1^ct
 		}else if(currR2 < minR2){
-			mult <- 1/1.05^ct
+			mult <- 1/1.1^ct
 		}
 		# compute Y
 		Y <- Q0 + errOut
