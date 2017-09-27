@@ -518,14 +518,14 @@ get_dr_tmle <- function(W, A, Y, Q, g, folds, est_name, ...){
 
   dr_fit <- drtmle(W = W, A = A, Y = Y, Qn = Qn, gn = gn,
                    a_0 = c(0,1), maxIter = 5, cvFolds = cvFolds, 
-                   SL_Qr = "SL.hal9001", SL_gr = "SL.hal9001",
+                   glm_Qr = "gn + I(gn^2)", glm_gr = "Qn + I(Qn^2)",
                    verbose = FALSE)
 
   ci_dr_fit <- ci(dr_fit, contrast = c(-1,1))
   est <- ci_dr_fit$drtmle[1,1]
   se <- (ci_dr_fit$drtmle[1,1] - ci_dr_fit$drtmle[1,2])/qnorm(0.975)
 
-  return(list(est = est, se = se))
+  return(c(est = est, se = se))
 }
 
 #' @export
@@ -546,6 +546,7 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
                       which_dr_tmle = c("full_sl","cv_full_sl",
                                         "SL.hal9001","cv_SL.hal9001")){
 	# estimate nuisance
+  cat("Fitting nuisance \n")
 	nuisance <- estimate_nuisance(Y = Y, W = W, A = A, V = V, learners = learners,
 	                              remove_learner = remove_learner, 
 	                              sl_control_Q = sl_control_Q,
@@ -560,6 +561,7 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
     data.frame(tmp)
   })
 
+  cat("Getting TMLEs \n")
 	# get logistic tmles
 	log_tmle <- mapply(Qbar = nuisance$Qbar, g = nuisance$g, logistic_tmle,
 	                   MoreArgs = list(Y = Y, A = A, W = W), SIMPLIFY = FALSE)
@@ -593,6 +595,7 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
 	                                FUN = c, SIMPLIFY = FALSE)
 
   # get dr inference TMLEs
+  cat("Getting DR-TMLEs \n")
   dr_tmle_results <- mapply(Q = nuisance$Qbar[which_dr_tmle], g = nuisance$g[which_dr_tmle], 
                     est_name = split(which_dr_tmle, 1:length(which_dr_tmle)),
                     get_dr_tmle,
