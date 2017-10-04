@@ -38,17 +38,13 @@ library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2
 library(SuperLearner)
 # full parm
 # ns <- c(200, 1000, 5000)
-ns <- c(1000)
-min_R2 <- c(0.01, seq(0.101, 0.901, by = 0.1))
-max_R2 <- c(seq(0.1,0.9,0.1),0.99)
-mat_R2 <- cbind(min_R2, max_R2)
+ns <- c(200, 1000, 5000)
 bigB <- 1000
 
 
 # # simulation parameters
 parm <- expand.grid(seed=1:bigB,
-                    n=ns,
-                    range_R2 = split(mat_R2, row(mat_R2)))
+                    n=ns)
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
@@ -62,9 +58,25 @@ if (args[1] == 'listsize') {
   # cat(1)
 }
 
+make_ks <- function(n){
+  z1 <- rnorm(n)
+  z2 <- rnorm(n)
+  z3 <- rnorm(n)
+  z4 <- rnorm(n)
+
+  w1 <- exp(z1/2)
+  w2 <- z2/(1+exp(z1)) + 10
+  w3 <- (z1*z3/25 + 0.6)^3
+  w4 <- (z2 + z4 + 20)^2
+
+  Y <- 210 + 27.4*z1 + 13.7*z2 + 13.7*z3 + 13.7*z4 + rnorm(n)
+  g0 <- plogis(-z1 + 0.5*z2 - 0.25*z3 - 0.1*z4)
+  A <- rbinom(n, 1, g0)
+  return(list(Y = Y, A = A, W = data.frame(W1 = w1, W2 = w2, W3 = w3, W4 = w4)))
+}
 # execute prepare job ##################
 if (args[1] == 'prepare') {
-  
+
 }
 
 # execute parallel job #################################################
@@ -83,13 +95,7 @@ if (args[1] == 'run') {
     print(parm[i,])
 
     set.seed(parm$seed[i])
-    dat <- haltmle.sim:::makeRandomData(n=parm$n[i], maxD = 8,
-                                        minObsA = 30,
-                                        minR2 = parm$range_R2[[i]][1],
-                                        maxR2 = parm$range_R2[[i]][2])
-    save(dat, file=paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],
-                          "_r2=",parm$range_R2[[i]][1],".RData"))
-    print("data saved")
+    dat <- make_ks(n=parm$n[i])
 
     algo <- c("SL.hal9001",
               "SL.glm",
@@ -105,15 +111,11 @@ if (args[1] == 'run') {
               "SL.kernelKnn")
         
     # fit super learner with all algorithms
-    set.seed(parm$seed[i])
-    dat$W <- data.frame(dat$W)
-    colnames(dat$W) <- paste0("W",1:ncol(dat$W))
-
-    out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
+    out <- get_all_ates(Y = dat$Y, A = dat$A, W = dat$W, 
                         V = 6, learners = algo, remove_learner = "SL.hal9001")
 
-    save(out, file=paste0(saveDir,"out_n=",parm$n[i],"_seed=",parm$seed[i],
-                          "_r2=",parm$range_R2[[i]][1],".RData"))
+    save(out, file=paste0(saveDir,"ks_out_n=",parm$n[i],"_seed=",parm$seed[i],
+                          ".RData"))
     }
 }
 

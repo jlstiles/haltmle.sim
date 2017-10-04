@@ -38,17 +38,24 @@ library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2
 library(SuperLearner)
 # full parm
 # ns <- c(200, 1000, 5000)
-ns <- c(1000)
-min_R2 <- c(0.01, seq(0.101, 0.901, by = 0.1))
-max_R2 <- c(seq(0.1,0.9,0.1),0.99)
-mat_R2 <- cbind(min_R2, max_R2)
+ns <- c(200, 1000, 5000)
 bigB <- 1000
+four_period <- c(0.5, 1, 5, 10)
+two_period <- c(0.5, 10)
 
 
 # # simulation parameters
-parm <- expand.grid(seed=1:bigB,
+parm_Q <- expand.grid(seed=1:bigB,
                     n=ns,
-                    range_R2 = split(mat_R2, row(mat_R2)))
+                    Q_period = four_period,
+                    g_period = two_period)
+parm_g <- expand.grid(seed=1:bigB,
+                    n=ns,
+                    Q_period = two_period,
+                    g_period = four_period)
+parm_g <- parm_g[-which(parm_g$g_period == 0.5 | parm_g$g_period == 10), ]
+
+parm <- rbind(parm_Q, parm_g)
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
@@ -62,9 +69,23 @@ if (args[1] == 'listsize') {
   # cat(1)
 }
 
+make_sin <- function(n, Qp, gp){
+  w1 <- runif(n, 0, 2*pi)
+  # variation norm = 0.8*Qp
+  Q0 <- 0.4*sin(Qp*w1) + 0.5 
+  # variation norm = 0.8*gp
+  g0 <- 0.4*sin(gp*w1) + 0.5
+
+  A <- rbinom(n ,1, g0)
+  Y <- rbinom(n, 1, Q0)
+
+  return(list(W = data.frame(W1 = w1), A = A, Y = Y))
+}
+
 # execute prepare job ##################
 if (args[1] == 'prepare') {
-  
+  # for(i in 1:nrow(parm)){
+  # }
 }
 
 # execute parallel job #################################################
@@ -83,37 +104,17 @@ if (args[1] == 'run') {
     print(parm[i,])
 
     set.seed(parm$seed[i])
-    dat <- haltmle.sim:::makeRandomData(n=parm$n[i], maxD = 8,
-                                        minObsA = 30,
-                                        minR2 = parm$range_R2[[i]][1],
-                                        maxR2 = parm$range_R2[[i]][2])
-    save(dat, file=paste0(scratchDir,"draw_n=",parm$n[i],"_seed=",parm$seed[i],
-                          "_r2=",parm$range_R2[[i]][1],".RData"))
-    print("data saved")
+    dat <- make_sin(n=parm$n[i], Qp = parm$Q_period[i], gp = parm$g_period[i])
 
     algo <- c("SL.hal9001",
-              "SL.glm",
-              "SL.bayesglm", 
-              "SL.earth",
-              "SL.step.interaction",
-              "SL.gam", 
-              "SL.dbarts.mod",
-              "SL.gbm.caretMod",
-              "SL.rf.caretMod",
-              "SL.rpart.caretMod", 
-              "SL.mean",
-              "SL.kernelKnn")
+              "SL.mean")
         
     # fit super learner with all algorithms
-    set.seed(parm$seed[i])
-    dat$W <- data.frame(dat$W)
-    colnames(dat$W) <- paste0("W",1:ncol(dat$W))
+    out <- get_all_ates(Y = dat$Y, A = dat$A, W = dat$W, 
+                        V = 6, learners = algo, remove_learner = NULL)
 
-    out <- get_all_ates(Y = dat$Y$Y, A = dat$A$A, W = dat$W, 
-                        V = 6, learners = algo, remove_learner = "SL.hal9001")
-
-    save(out, file=paste0(saveDir,"out_n=",parm$n[i],"_seed=",parm$seed[i],
-                          "_r2=",parm$range_R2[[i]][1],".RData"))
+    save(out, file=paste0(saveDir,"sin_out_n=",parm$n[i],"_seed=",parm$seed[i],
+                          "_Qp=",parm$Q_period[i],"_gp=",parm$g_period[i],".RData"))
     }
 }
 

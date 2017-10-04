@@ -23,7 +23,9 @@ SL.dbarts.mod = function(Y, X, newX, family, obsWeights, id,
                      ...) {
 
   SuperLearner:::.SL.require("dbarts")
-
+  if(dim(X)[2] == 1){
+    X <- X[,1]; newX <- newX[,1]
+  }
   model =
     dbarts::bart(x.train = X,
                  y.train = Y,

@@ -2,17 +2,40 @@
 # commands for scp'ing sce and cent over
 #-----------------------------------------
 cd ~/Dropbox/R/haltmle.sim/sandbox
+# random mechanisms
 scp  cent.R sce.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
+# kang and schafer
+scp  cent_ks.R sce_ks.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
+# scp mergeOnly.R subMerge.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
+
+ssh dbenkese@snail.fhcrc.org
+cd haltmle.sim
+# random mechanisms 
+scp cent.R sce.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
+# kang and schafer
+scp cent_ks.R sce_ks.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
+
+ssh dbenkese@rhino.fhcrc.org
+cd haltmle.sim
+# random mechanisms
+./sce.sh ./cent.R b2_V1
+# kang and schafer
+./sce_ks.sh ./cent_ks.R ks_v1
+
+#-----------------------
+cd ~/Dropbox/R/haltmle.sim/sandbox
+scp test.R dbenkese@snail.fhcrc.org:~/haltmle.sim
 # scp mergeOnly.R subMerge.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 
 ssh dbenkese@snail.fhcrc.org
 cd haltmle.sim
 # scp mergeOnly.R subMerge.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
-scp cent.R sce.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
+scp test.R dbenkese@rhino.fhcrc.org:~/haltmle.sim
 
 ssh dbenkese@rhino.fhcrc.org
 cd haltmle.sim
-./sce.sh ./cent.R run_V2_3
+chmod +x test.R
+sbatch -N 1 test.R
 
 #-----------------------------------------
 # commands for scp'ing mergeOnly
