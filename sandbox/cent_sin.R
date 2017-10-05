@@ -38,7 +38,7 @@ library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2
 library(SuperLearner)
 # full parm
 # ns <- c(200, 1000, 5000)
-ns <- c(200, 1000, 5000)
+ns <- c(1000)
 bigB <- 1000
 four_period <- c(0.5, 1, 5, 10)
 two_period <- c(0.5, 10)

@@ -6,6 +6,8 @@ cd ~/Dropbox/R/haltmle.sim/sandbox
 scp  cent.R sce.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 # kang and schafer
 scp  cent_ks.R sce_ks.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
+# sin wave
+scp  cent_sin.R sce_sin.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 # scp mergeOnly.R subMerge.sh dbenkese@snail.fhcrc.org:~/haltmle.sim
 
 ssh dbenkese@snail.fhcrc.org
@@ -14,6 +16,8 @@ cd haltmle.sim
 scp cent.R sce.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
 # kang and schafer
 scp cent_ks.R sce_ks.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
+# sin wave
+scp cent_sin.R sce_sin.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
 
 ssh dbenkese@rhino.fhcrc.org
 cd haltmle.sim
@@ -21,6 +25,8 @@ cd haltmle.sim
 ./sce.sh ./cent.R redos_b12_V4
 # kang and schafer
 ./sce_ks.sh ./cent_ks.R ks_v2
+# sin wave
+./sce_sin.sh ./cent_sin.R sin_b1_v1
 
 #-----------------------
 cd ~/Dropbox/R/haltmle.sim/sandbox

@@ -132,6 +132,84 @@ if (args[1] == 'run') {
 
 # merge job ###########################
 if (args[1] == 'merge') {
+  format_result <- function(out){
+    tmle_os_list <- lapply(out, function(l){
+      # browser()
+      cv_est <- grepl("cv_", names(l))
+      for(i in 1:length(l)){
+        l[[i]] <- data.frame(as.list(l[[i]]))
+      }
+      for(i in 1:length(l)){
+        if(cv_est[i]){
+          l[[i]]$cv_ci_l <- l[[i]]$est - qnorm(0.975)*l[[i]]$se
+          l[[i]]$cv_ci_u <- l[[i]]$est + qnorm(0.975)*l[[i]]$se
+          l[[i]]$cov_cv_ci <- l[[i]]$cv_ci_l < truth & l[[i]]$cv_ci_u > truth
+        }else{
+          l[[i]]$ci_l <- l[[i]]$est - qnorm(0.975)*l[[i]]$se
+          l[[i]]$ci_u <- l[[i]]$est + qnorm(0.975)*l[[i]]$se
+          l[[i]]$cov_ci <- l[[i]]$ci_l < truth & l[[i]]$ci_u > truth
+          l[[i]]$cv_ci_l <- l[[i]]$est - qnorm(0.975)*l[[i+1]]$se
+          l[[i]]$cv_ci_u <- l[[i]]$est + qnorm(0.975)*l[[i+1]]$se
+          l[[i]]$cov_cv_ci <- l[[i]]$cv_ci_l < truth & l[[i]]$cv_ci_u > truth
+        }
+      }
+      return(l)
+    })
+    return(tmle_os_list)
+  }
+
+  all_files <- list.files("~/haltmle.sim/out")
+  ks_files <- all_files[grepl("ks",all_files)]
+  logistic_tmle_rslt <- matrix(nrow = length(ks_files), ncol = 182 + 1)
+  linear_tmle_rslt <- matrix(nrow = length(ks_files), ncol = 182 + 1)
+  onestep_rslt <- matrix(nrow = length(ks_files), ncol = 182 + 1)
+  drtmle_rslt <- matrix(nrow = length(ks_files), ncol = 26 + 1)
+  for(i in seq_along(ks_files)){
+    # get sample size
+    this_n <- as.numeric(strsplit(strsplit(ks_files[i], "_")[[1]][2], "n=")[[1]][2])
+    # load file
+    load(ks_files[i])
+    # format this file
+    tmp <- format_result(out)
+    # add results to rslt
+    logistic_tmle_rslt[i,] <- c(this_n, unlist(tmp[[1]]))
+    linear_tmle_rslt[i,] <- c(this_n,unlist(tmp[[2]]))
+    onestep_rslt[i,] <- c(this_n,unlist(tmp[[3]]))
+    drtmle_rslt[i,] <- c(this_n,unlist(tmp[[4]]))
+  }
+  col_names_1 <- c("n", names(unlist(tmp[[1]],use.names = TRUE)))
+  col_names_2 <- c("n", names(unlist(tmp[[4]],use.names = TRUE)))
+  logistic_tmle_rslt <- data.frame(logistic_tmle_rslt)
+  colnames(logistic_tmle_rslt) <- col_names_1
+  linear_tmle_rslt <- data.frame(linear_tmle_rslt)
+  colnames(linear_tmle_rslt) <- col_names_1
+  onestep_rslt <- data.frame(onestep_rslt)
+  colnames(onestep_rslt) <- col_names_1
+  drtmle_rslt <- data.frame(drtmle_rslt)
+  colnames(drtmle_rslt) <- col_names_2
+
+  # bias
+  by(logistic_tmle_rslt, logistic_tmle_rslt$n, function(x){
+    colMeans(x[,c("full_sl.cov_ci","full_sl.cov_cv_ci","cv_full_sl.cov_cv_ci",
+                  "SL.hal9001.cov_ci","SL.hal9001.cov_cv_ci","cv_SL.hal9001.cov_cv_ci"
+                  )])
+  })
+  by(linear_tmle_rslt, linear_tmle_rslt$n, function(x){
+    colMeans(x[,c("full_sl.cov_ci","full_sl.cov_cv_ci","cv_full_sl.cov_cv_ci",
+                  "SL.hal9001.cov_ci","SL.hal9001.cov_cv_ci","cv_SL.hal9001.cov_cv_ci"
+                  )])
+  })
+  by(onestep_rslt, onestep_rslt$n, function(x){
+    colMeans(x[,c("full_sl.cov_ci","full_sl.cov_cv_ci","cv_full_sl.cov_cv_ci",
+                  "SL.hal9001.cov_ci","SL.hal9001.cov_cv_ci","cv_SL.hal9001.cov_cv_ci"
+                  )])
+  })
+  by(drtmle_rslt, drtmle_rslt$n, function(x){
+    colMeans(x[,c("full_sl.cov_ci","full_sl.cov_cv_ci","cv_full_sl.cov_cv_ci",
+                  "SL.hal9001.cov_ci","SL.hal9001.cov_cv_ci","cv_SL.hal9001.cov_cv_ci"
+                  )])
+  })
+
   # n <- sum <- slFull <- slDrop <- cand <- NULL
   # # get summary
 

@@ -115,13 +115,13 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
 	if(length(learners) > 1){
-    cv_learner_pred[c(idx, n + idx),] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
+    cv_learner_pred[c(rbind(idx, n + idx)),] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
   }else{
-    cv_learner_pred[c(idx, n + idx),] <- Reduce(c, lapply(all_out, "[[", "learner_pred"))
+    cv_learner_pred[c(rbind(idx, n + idx)),] <- Reduce(c, lapply(all_out, "[[", "learner_pred"))
   }
 	if(compute_superlearner){
     cv_sl_pred <- rep(NA, 2*length(Y))
-  	cv_sl_pred[c(idx, n + idx)] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
+  	cv_sl_pred[c(rbind(idx, n + idx))] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
   }else{
     cv_sl_pred <- NULL
   }
