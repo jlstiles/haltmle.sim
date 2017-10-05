@@ -43,7 +43,6 @@ bigB <- 1000
 four_period <- c(0.5, 1, 5, 10)
 two_period <- c(0.5, 10)
 
-
 # # simulation parameters
 parm_Q <- expand.grid(seed=1:bigB,
                     n=ns,
@@ -106,14 +105,14 @@ if (args[1] == 'run') {
     set.seed(parm$seed[i])
     dat <- make_sin(n=parm$n[i], Qp = parm$Q_period[i], gp = parm$g_period[i])
 
-    algo <- c("SL.hal9001",
-              "SL.mean")
+    algo <- "SL.hal9001"
         
     # fit super learner with all algorithms
-    out <- get_all_ates(Y = dat$Y, A = dat$A, W = dat$W, 
-                        V = 6, learners = algo, remove_learner = NULL)
+    out <- get_all_ates(Y = dat$Y, A = dat$A, W = dat$W, compute_superlearner = FALSE,
+                        V = 6, learners = algo, remove_learner = NULL,
+                        which_dr_tmle = c("SL.hal9001", "cv_SL.hal9001"))    
 
-    save(out, file=paste0(saveDir,"sin_out_n=",parm$n[i],"_seed=",parm$seed[i],
+    save(out, file=paste0(saveDir,"sin_n=",parm$n[i],"_seed=",parm$seed[i],
                           "_Qp=",parm$Q_period[i],"_gp=",parm$g_period[i],".RData"))
     }
 }

@@ -38,13 +38,24 @@ library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2
 library(SuperLearner)
 # full parm
 # ns <- c(200, 1000, 5000)
-ns <- c(200, 1000, 5000)
-bigB <- 1000
+# ns <- c(200, 1000, 5000)
+# bigB <- 1000
 
 
-# # simulation parameters
-parm <- expand.grid(seed=1:bigB,
-                    n=ns)
+# # # simulation parameters
+# parm <- expand.grid(seed=1:bigB,
+#                     n=ns)
+
+# parm <- find_missing_files(tag = "ks",
+#                            # parm needs to be in same order as 
+#                            # file saves -- should make this more general...
+#                            parm = c("n", "seed"),
+#                            parm_values = list(seed = 1:1000,
+#                                               n = c(200,1000,5000)))
+# save(parm, file = "~/haltmle.sim/scratch/remain_ks_sims.RData")
+
+load("~/haltmle.sim/scratch/remain_ks_sims.RData")
+
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
@@ -114,7 +125,7 @@ if (args[1] == 'run') {
     out <- get_all_ates(Y = dat$Y, A = dat$A, W = dat$W, 
                         V = 6, learners = algo, remove_learner = "SL.hal9001")
 
-    save(out, file=paste0(saveDir,"ks_out_n=",parm$n[i],"_seed=",parm$seed[i],
+    save(out, file=paste0(saveDir,"ks_n=",parm$n[i],"_seed=",parm$seed[i],
                           ".RData"))
     }
 }

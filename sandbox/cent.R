@@ -38,17 +38,36 @@ library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2
 library(SuperLearner)
 # full parm
 # ns <- c(200, 1000, 5000)
-ns <- c(1000)
-min_R2 <- c(0.01, seq(0.101, 0.901, by = 0.1))
-max_R2 <- c(seq(0.1,0.9,0.1),0.99)
-mat_R2 <- cbind(min_R2, max_R2)
-bigB <- 1000
+# ns <- c(200)
+# min_R2 <- c(0.01, seq(0.101, 0.901, by = 0.1))
+# max_R2 <- c(seq(0.1,0.9,0.1),0.99)
+# mat_R2 <- cbind(min_R2, max_R2)
+# bigB <- 1000
 
+# # # simulation parameters
+# parm <- expand.grid(seed=1:bigB,
+#                     n=ns,
+#                     range_R2 = split(mat_R2, row(mat_R2)))
 
-# # simulation parameters
-parm <- expand.grid(seed=1:bigB,
-                    n=ns,
-                    range_R2 = split(mat_R2, row(mat_R2)))
+# parm <- find_missing_files()
+# parm$r2 <- round(parm$r2,3)
+# # reformat r2 column
+# parm$r2_max <- NA
+# parm$r2_max[parm$r2 == 0.01] <- 0.1
+# parm$r2_max[parm$r2 == 0.101] <- 0.2
+# parm$r2_max[parm$r2 == 0.201] <- 0.3
+# parm$r2_max[parm$r2 == 0.301] <- 0.4
+# parm$r2_max[parm$r2 == 0.401] <- 0.5
+# parm$r2_max[parm$r2 == 0.501] <- 0.6
+# parm$r2_max[parm$r2 == 0.601] <- 0.7
+# parm$r2_max[parm$r2 == 0.701] <- 0.8
+# parm$r2_max[parm$r2 == 0.801] <- 0.90
+# parm$r2_max[parm$r2 == 0.901] <- 0.99
+# rangeR2 <- apply(parm, 1, function(x){ c(x[3], x[4]) })
+# rangeR2 <- split(rangeR2, col(rangeR2))
+# parm$range_R2 <- rangeR2
+# save(parm, file = "~/haltmle.sim/scratch/remain_sims.RData")
+load("~/haltmle.sim/scratch/remain_sims.RData")
 
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"

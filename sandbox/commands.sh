@@ -18,9 +18,9 @@ scp cent_ks.R sce_ks.sh dbenkese@rhino.fhcrc.org:~/haltmle.sim
 ssh dbenkese@rhino.fhcrc.org
 cd haltmle.sim
 # random mechanisms
-./sce.sh ./cent.R b2_V1
+./sce.sh ./cent.R redos_b12_V4
 # kang and schafer
-./sce_ks.sh ./cent_ks.R ks_v1
+./sce_ks.sh ./cent_ks.R ks_v2
 
 #-----------------------
 cd ~/Dropbox/R/haltmle.sim/sandbox

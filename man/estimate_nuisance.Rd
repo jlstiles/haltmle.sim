@@ -5,10 +5,10 @@
 \title{estimate_nuisance}
 \usage{
 estimate_nuisance(Y, W, A, V = 5, learners, remove_learner = NULL,
-  sl_control_Q = list(ensemble_fn = "ensemble_linear", optim_risk_fn =
-  "optim_risk_sl_se", weight_fn = "weight_sl_convex", cv_risk_fn =
-  "cv_risk_sl_r2", family = gaussian(), alpha = 0.05),
-  sl_control_g = list(ensemble_fn = "ensemble_linear", optim_risk_fn =
+  compute_superlearner = TRUE, sl_control_Q = list(ensemble_fn =
+  "ensemble_linear", optim_risk_fn = "optim_risk_sl_se", weight_fn =
+  "weight_sl_convex", cv_risk_fn = "cv_risk_sl_r2", family = gaussian(), alpha =
+  0.05), sl_control_g = list(ensemble_fn = "ensemble_linear", optim_risk_fn =
   "optim_risk_sl_nloglik", weight_fn = "weight_sl_convex", cv_risk_fn =
   "cv_risk_sl_r2", family = binomial(), alpha = 0.05))
 }

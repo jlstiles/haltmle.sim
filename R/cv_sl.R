@@ -81,7 +81,7 @@ get_rm_sl <- function(task, Y, V, all_fit_tasks, all_fits, folds, sl_control, le
 
 get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds, 
                              sl_control, return_learner_fits = TRUE,
-                             learners, remove_index = NULL){
+                             learners, remove_index = NULL, compute_superlearner = TRUE){
 	# 
   n <- length(Y)
 	train_matrix <- combn(V, V-1)
@@ -89,19 +89,24 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
 		learner_idx <- cvma:::search_fits_for_training_folds(fits = all_fit_tasks, 
                                           y = "Y", 
                                           training_folds = tr)
-		if(!is.null(remove_index)){
-			learner_idx <- learner_idx[-remove_index]
-		}
-		sl_idx <- cvma:::search_fits_for_training_folds(fits = all_sl, 
-                                          y = "Y", 
-                                          training_folds = tr)
+		if(compute_superlearner){
+      if(!is.null(remove_index)){
+  			learner_idx <- learner_idx[-remove_index]
+  		}
+  		sl_idx <- cvma:::search_fits_for_training_folds(fits = all_sl, 
+                                            y = "Y", 
+                                            training_folds = tr)
+    }
 		all_pred_setA <- Reduce(cbind,sapply(learner_idx, function(i){
 			unlist(all_fits[[i]]$pred_setA)
 		}, simplify = FALSE))
 
-		sl_pred_setA <- do.call(sl_control$ensemble_fn, args = list(pred = all_pred_setA,
-		                                                            weight = all_sl[[sl_idx]]$sl_weight))
-
+    if(compute_superlearner){
+  		sl_pred_setA <- do.call(sl_control$ensemble_fn, args = list(pred = all_pred_setA,
+  		                                                            weight = all_sl[[sl_idx]]$sl_weight))
+    }else{
+      sl_pred_setA <- NULL
+    }
 		return(list(learner_pred = all_pred_setA,
 		            sl_pred = sl_pred_setA))
 	})
@@ -109,10 +114,17 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
   	cv_learner_pred <- matrix(NA, nrow = 2*length(Y), 
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
-	cv_learner_pred[c(idx, n + idx),] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
-	cv_sl_pred <- rep(NA, 2*length(Y))
-	cv_sl_pred[c(idx, n + idx)] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
-
+	if(length(learners) > 1){
+    cv_learner_pred[c(idx, n + idx),] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
+  }else{
+    cv_learner_pred[c(idx, n + idx),] <- Reduce(c, lapply(all_out, "[[", "learner_pred"))
+  }
+	if(compute_superlearner){
+    cv_sl_pred <- rep(NA, 2*length(Y))
+  	cv_sl_pred[c(idx, n + idx)] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
+  }else{
+    cv_sl_pred <- NULL
+  }
     return(list(cv_learner_pred = cv_learner_pred,
                 cv_sl_pred = cv_sl_pred))
 }
@@ -206,7 +218,7 @@ get_ps_fit <- function(task, folds, W, A, sl_control){
 
 get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds, 
                              sl_control, return_learner_fits = TRUE,
-                             learners, remove_index = NULL){
+                             learners, remove_index = NULL, compute_superlearner){
 	n <- length(A)
 	train_matrix <- combn(V, V-1)
 	all_out <- lapply(split(train_matrix,col(train_matrix)), function(tr){
@@ -216,16 +228,20 @@ get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds,
 		if(!is.null(remove_index)){
 			learner_idx <- learner_idx[-remove_index]
 		}
+    if(compute_superlearner){
 		sl_idx <- cvma:::search_fits_for_training_folds(fits = all_sl, 
                                           y = "A", 
                                           training_folds = tr)
+    }
 		all_pred_setA <- Reduce(cbind,sapply(learner_idx, function(i){
 			unlist(all_fits[[i]]$pred_setA)
 		}, simplify = FALSE))
-
-		sl_pred_setA <- do.call(sl_control$ensemble_fn, args = list(pred = all_pred_setA,
-		                                                            weight = all_sl[[sl_idx]]$sl_weight))
-
+    if(compute_superlearner){
+  		sl_pred_setA <- do.call(sl_control$ensemble_fn, args = list(pred = all_pred_setA,
+  		                                                            weight = all_sl[[sl_idx]]$sl_weight))
+    }else{
+      sl_pred_setA <- NULL
+    }
 		return(list(learner_pred = all_pred_setA,
 		            sl_pred = sl_pred_setA))
 	})
@@ -233,10 +249,17 @@ get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds,
   	cv_learner_pred <- matrix(NA, nrow = length(A), 
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
-	cv_learner_pred[idx,] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
+  if(length(learners) > 1){
+    cv_learner_pred[idx,] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
+  }else{
+    cv_learner_pred[idx,] <- Reduce(c, lapply(all_out, "[[", "learner_pred"))
+  }  
+  if(compute_superlearner){
 	cv_sl_pred <- rep(NA, length(A))
 	cv_sl_pred[idx] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
-
+  }else{
+    cv_sl_pred <- NULL
+  }
     return(list(cv_learner_pred = cv_learner_pred,
                 cv_sl_pred = cv_sl_pred))
 }
@@ -247,6 +270,7 @@ get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds,
 #' 
 estimate_nuisance <- function(Y, W, A, V = 5, learners, 
                               remove_learner = NULL, 
+                              compute_superlearner = TRUE, 
                       sl_control_Q = list(ensemble_fn = "ensemble_linear",
                                    optim_risk_fn = "optim_risk_sl_se",
                                    weight_fn = "weight_sl_convex",
@@ -271,32 +295,47 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
     # outcome regression
     #---------------------------------
     # all learner fitting tasks
+    if(compute_superlearner){
+      fold_fits <- c(V-1,V-2)      
+    }else{
+      fold_fits <- V-1
+    }
     all_fit_tasks <- cvma:::make_fit_task_list(Ynames = "Y", learners = learners, 
                                         V = V, return_outer_sl = TRUE,
-                                        fold_fits = c(V-1, V-2))
+                                        fold_fits = fold_fits)
 
     # NOTE: could be future_lapply for parallelization
     all_fits <- future::future_lapply(all_fit_tasks, FUN = get_or_fit, folds = folds, 
                               W = W, A = A, Y = Y, sl_control = sl_control_Q)
 
     # all super learner weight-getting tasks
-    all_sl_tasks <- cvma:::make_sl_task_list(Ynames = "Y", V = V, fold_fits = c(V, V-1))
-    # TO DO: I have a hunch that if future_lapply requires transferring
-    #        all_fits between nodes that the communication overhead will make
-    #        parallelization of this step slower than doing it sequentially 
-    all_sl <- lapply(all_sl_tasks, FUN = cvma:::get_sl, 
-                            Y = data.frame(Y=Y), V = V, all_fit_tasks = all_fit_tasks, 
-                            all_fits = all_fits, folds = folds,
-                            learners = learners, sl_control = sl_control_Q)
-                            # ensemble_fn = ensemble_fn, risk_sl_control = risk_sl_control, 
-                            # weight_sl_control = weight_sl_control)
+    if(compute_superlearner){
+      all_sl_tasks <- cvma:::make_sl_task_list(Ynames = "Y", V = V, fold_fits = c(V, V-1))
+      # TO DO: I have a hunch that if future_lapply requires transferring
+      #        all_fits between nodes that the communication overhead will make
+      #        parallelization of this step slower than doing it sequentially 
+      all_sl <- lapply(all_sl_tasks, FUN = cvma:::get_sl, 
+                              Y = data.frame(Y=Y), V = V, all_fit_tasks = all_fit_tasks, 
+                              all_fits = all_fits, folds = folds,
+                              learners = learners, sl_control = sl_control_Q)
+                              # ensemble_fn = ensemble_fn, risk_sl_control = risk_sl_control, 
+                              # weight_sl_control = weight_sl_control)
+    }else{
+      all_sl <- NULL
+    }
 
     cv_pred <- get_ate_cv_Q_pred(Y, V, all_fit_tasks, all_fits, all_sl, folds, 
-                             sl_control_Q, learners = learners)
+                             sl_control_Q, learners = learners, remove_index = NULL,
+                             compute_superlearner = compute_superlearner)
     # get predictions for non-CV TMLE
     pred <- Reduce(cbind, lapply(all_fits[1:length(learners)], "[[", "pred_setA"))
-    sl_pred <- do.call(sl_control_Q$ensemble_fn, args = list(pred = pred, weight = 
-                                                           all_sl[[1]]$sl_weight))
+    if(class(pred) == "numeric"){
+      pred <- matrix(pred)
+    }
+    if(compute_superlearner){
+      sl_pred <- do.call(sl_control_Q$ensemble_fn, args = list(pred = pred, weight = 
+                                                             all_sl[[1]]$sl_weight))
+    }
     # now try without a particular learner
     if(!is.null(remove_learner)){
 	    remove_index <- which(learners %in% remove_learner)    	
@@ -316,23 +355,25 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 
     # format everything
     Qbar_list <- list()
-    # hal super learner
-    Qbar_list$full_sl <- data.frame(Q0W = sl_pred[1:n],
-                                   Q1W = sl_pred[(n+1):(2*n)],
-                                   QAW = as.numeric(ifelse(A == 0, sl_pred[1:n], sl_pred[(n+1):(2*n)])))
-    # cv hal super learner
-    Qbar_list$cv_full_sl <- data.frame(Q0W = cv_pred$cv_sl_pred[1:n],
-                                   Q1W = cv_pred$cv_sl_pred[(n+1):(2*n)],
-                                   QAW = as.numeric(ifelse(A == 0, cv_pred$cv_sl_pred[1:n], cv_pred$cv_sl_pred[(n+1):(2*n)])))
-    if(!is.null(remove_learner)){
-	    # hal super learner
-	    Qbar_list$rm_sl <- data.frame(Q0W = sl_pred_rm[1:n],
-	                                   Q1W = sl_pred_rm[(n+1):(2*n)],
-	                                   QAW = as.numeric(ifelse(A == 0, sl_pred_rm[1:n], sl_pred_rm[(n+1):(2*n)])))
-	    # cv hal super learner
-	    Qbar_list$cv_rm_sl <- data.frame(Q0W = cv_pred_rm$cv_sl_pred[1:n],
-	                                   Q1W = cv_pred_rm$cv_sl_pred[(n+1):(2*n)],
-	                                   QAW = as.numeric(ifelse(A == 0, cv_pred_rm$cv_sl_pred[1:n], cv_pred$cv_sl_pred[(n+1):(2*n)])))
+    if(compute_superlearner){
+      # hal super learner
+      Qbar_list$full_sl <- data.frame(Q0W = sl_pred[1:n],
+                                     Q1W = sl_pred[(n+1):(2*n)],
+                                     QAW = as.numeric(ifelse(A == 0, sl_pred[1:n], sl_pred[(n+1):(2*n)])))
+      # cv hal super learner
+      Qbar_list$cv_full_sl <- data.frame(Q0W = cv_pred$cv_sl_pred[1:n],
+                                     Q1W = cv_pred$cv_sl_pred[(n+1):(2*n)],
+                                     QAW = as.numeric(ifelse(A == 0, cv_pred$cv_sl_pred[1:n], cv_pred$cv_sl_pred[(n+1):(2*n)])))
+      if(!is.null(remove_learner)){
+  	    # hal super learner
+  	    Qbar_list$rm_sl <- data.frame(Q0W = sl_pred_rm[1:n],
+  	                                   Q1W = sl_pred_rm[(n+1):(2*n)],
+  	                                   QAW = as.numeric(ifelse(A == 0, sl_pred_rm[1:n], sl_pred_rm[(n+1):(2*n)])))
+  	    # cv hal super learner
+  	    Qbar_list$cv_rm_sl <- data.frame(Q0W = cv_pred_rm$cv_sl_pred[1:n],
+  	                                   Q1W = cv_pred_rm$cv_sl_pred[(n+1):(2*n)],
+  	                                   QAW = as.numeric(ifelse(A == 0, cv_pred_rm$cv_sl_pred[1:n], cv_pred$cv_sl_pred[(n+1):(2*n)])))
+      }
     }
     # add other predictions
     for(i in 1:ncol(pred)){
@@ -350,31 +391,36 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 	# all learner fitting tasks
     all_fit_tasks <- cvma:::make_fit_task_list(Ynames = "A", learners = learners, 
                                         V = V, return_outer_sl = TRUE,
-                                        fold_fits = c(V-1, V-2))
+                                        fold_fits = fold_fits)
 
     # NOTE: could be future_lapply for parallelization
     all_fits <- future::future_lapply(all_fit_tasks, FUN = get_ps_fit, folds = folds, 
                               W = W, A = A, sl_control = sl_control_g)
 
     # all super learner weight-getting tasks
-    all_sl_tasks <- cvma:::make_sl_task_list(Ynames = "A", V = V, fold_fits = c(V, V-1))
-    # TO DO: I have a hunch that if future_lapply requires transferring
-    #        all_fits between nodes that the communication overhead will make
-    #        parallelization of this step slower than doing it sequentially 
-    all_sl <- lapply(all_sl_tasks, FUN = cvma:::get_sl, 
-                            Y = data.frame(A=A), V = V, all_fit_tasks = all_fit_tasks, 
-                            all_fits = all_fits, folds = folds,
-                            learners = learners, sl_control = sl_control_g)
-                            # ensemble_fn = ensemble_fn, risk_sl_control = risk_sl_control, 
-                            # weight_sl_control = weight_sl_control)
-
+    if(compute_superlearner){
+      all_sl_tasks <- cvma:::make_sl_task_list(Ynames = "A", V = V, fold_fits = c(V, V-1))
+      # TO DO: I have a hunch that if future_lapply requires transferring
+      #        all_fits between nodes that the communication overhead will make
+      #        parallelization of this step slower than doing it sequentially 
+      all_sl <- lapply(all_sl_tasks, FUN = cvma:::get_sl, 
+                              Y = data.frame(A=A), V = V, all_fit_tasks = all_fit_tasks, 
+                              all_fits = all_fits, folds = folds,
+                              learners = learners, sl_control = sl_control_g)
+                              # ensemble_fn = ensemble_fn, risk_sl_control = risk_sl_control, 
+                              # weight_sl_control = weight_sl_control)
+    }
     cv_pred <- get_ate_cv_g_pred(A, V, all_fit_tasks, all_fits, all_sl, folds, 
-                             sl_control_g, learners = learners)
+                             sl_control_g, learners = learners, remove_index = NULL,
+                             compute_superlearner = compute_superlearner)
     # get predictions for non-CV TMLE
     pred <- Reduce(cbind, lapply(all_fits[1:length(learners)], "[[", "pred_setA"))
-    sl_pred <- do.call(sl_control_g$ensemble_fn, args = list(pred = pred, weight = 
-                                                           all_sl[[1]]$sl_weight))
-
+    if(class(pred) == "numeric"){
+      pred <- matrix(pred)
+    }
+    if(compute_superlearner){
+      sl_pred <- do.call(sl_control_g$ensemble_fn, args = list(pred = pred, weight = 
+                                                             all_sl[[1]]$sl_weight))
     # now try without a particular learner
     if(!is.null(remove_learner)){
     remove_index <- which(learners %in% remove_learner)
@@ -389,20 +435,23 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 
 	    cv_pred_rm <- get_ate_cv_g_pred(A, V, all_fit_tasks, all_fits, all_sl_rm, folds, 
 	                             sl_control_g, learners = learners, remove_index = remove_index)
-	}
+	   }
+    }
 
     # oragnize predictions
     # format everything
     g_list <- list()
-    # hal super learner
-    g_list$full_sl <- data.frame(g1W = sl_pred, g0W = 1 - sl_pred)
-    # cv hal super learner
-    g_list$cv_full_sl <- data.frame(g1W = cv_pred$cv_sl_pred, g0W = 1 - cv_pred$cv_sl_pred)
-    # hal super learner
-    if(!is.null(remove_learner)){
-	    g_list$sl <- data.frame(g1W = sl_pred_rm, g0W = 1 - sl_pred_rm)
-	    # cv hal super learner
-	    g_list$cv_sl <- data.frame(g1W = cv_pred_rm$cv_sl_pred, g0W = 1 - cv_pred_rm$cv_sl_pred)
+    if(compute_superlearner){
+      # hal super learner
+      g_list$full_sl <- data.frame(g1W = sl_pred, g0W = 1 - sl_pred)
+      # cv hal super learner
+      g_list$cv_full_sl <- data.frame(g1W = cv_pred$cv_sl_pred, g0W = 1 - cv_pred$cv_sl_pred)
+      # hal super learner
+      if(!is.null(remove_learner)){
+  	    g_list$sl <- data.frame(g1W = sl_pred_rm, g0W = 1 - sl_pred_rm)
+  	    # cv hal super learner
+  	    g_list$cv_sl <- data.frame(g1W = cv_pred_rm$cv_sl_pred, g0W = 1 - cv_pred_rm$cv_sl_pred)
+      }
     }
     # add other predictions
     for(i in 1:ncol(pred)){
@@ -530,7 +579,9 @@ get_dr_tmle <- function(W, A, Y, Q, g, folds, est_name, ...){
 
 #' @export
 get_all_ates <- function(Y, W, A, V = 5, learners, 
-                              remove_learner = NULL, gtol = 1e-3, 
+                              remove_learner = NULL, 
+                              compute_superlearner = TRUE, 
+                              gtol = 1e-3, 
                       sl_control_Q = list(ensemble_fn = "ensemble_linear",
                                    optim_risk_fn = "optim_risk_sl_se",
                                    weight_fn = "weight_sl_convex",
@@ -550,7 +601,8 @@ get_all_ates <- function(Y, W, A, V = 5, learners,
 	nuisance <- estimate_nuisance(Y = Y, W = W, A = A, V = V, learners = learners,
 	                              remove_learner = remove_learner, 
 	                              sl_control_Q = sl_control_Q,
-	                              sl_control_g = sl_control_g)
+	                              sl_control_g = sl_control_g,
+                                compute_superlearner = compute_superlearner)
   # truncate propensity estimates
   nuisance$g <- lapply(nuisance$g, function(g){
     tmp <- apply(g, 2, function(gn){ 
