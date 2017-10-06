@@ -114,14 +114,27 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
   	cv_learner_pred <- matrix(NA, nrow = 2*length(Y), 
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
+    tmp <- lapply(all_out, "[[", "learner_pred") # list 2x 
+    cv_pred_0 <- lapply(tmp, function(x){ nr <- nrow(x)/2; return(x[1:nr,]) })
+    cv_pred_1 <- lapply(tmp, function(x){ nr <- nrow(x)/2; return(x[(nr+1):(2*nr),]) })
+    cv_learner_pred_1 <- cv_learner_pred_0 <- matrix(NA, nrow = length(Y), ncol = ifelse(is.null(remove_index), length(learners),
+                                            length(learners) - length(remove_index)))   
 	if(length(learners) > 1){
-    cv_learner_pred[c(rbind(idx, n + idx)),] <- Reduce(rbind, lapply(all_out, "[[", "learner_pred"))
+    cv_learner_pred_0[idx,] <- Reduce(rbind, cv_pred_0)
+    cv_learner_pred_1[idx,] <- Reduce(rbind, cv_pred_1)
+    cv_learner_pred <- rbind(cv_learner_pred_0, cv_learner_pred_1)
+    # cv_learner_pred[c(rbind(idx, n + idx)),] <- Reduce(rbind, c(cv_pred_0, cv_pred_1))
   }else{
-    cv_learner_pred[c(rbind(idx, n + idx)),] <- Reduce(c, lapply(all_out, "[[", "learner_pred"))
+    cv_learner_pred_0[idx] <- Reduce(c, cv_pred_0)
+    cv_learner_pred_1[idx] <- Reduce(c, cv_pred_1)
+    cv_learner_pred <- c(cv_learner_pred_0, cv_learner_pred_1)
   }
 	if(compute_superlearner){
-    cv_sl_pred <- rep(NA, 2*length(Y))
-  	cv_sl_pred[c(rbind(idx, n + idx))] <- Reduce(c, lapply(all_out, "[[", "sl_pred"))
+    cv_sl_pred_0 <- cv_sl_pred_1 <- rep(NA, 2*length(Y))
+    tmp <- lapply(all_out, "[[", "sl_pred") # list 2x 
+    cv_sl_pred_0 <- lapply(tmp, function(x){ nr <- nrow(x)/2; return(x[1:nr,]) })
+    cv_sl_pred_1 <- lapply(tmp, function(x){ nr <- nrow(x)/2; return(x[(nr+1):(2*nr),]) })
+    cv_sl_pred <- c(cv_sl_pred_0, cv_sl_pred_1)
   }else{
     cv_sl_pred <- NULL
   }
@@ -245,7 +258,11 @@ get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds,
 		return(list(learner_pred = all_pred_setA,
 		            sl_pred = sl_pred_setA))
 	})
-  	idx <- unlist(split(1:n, folds)[V:1], use.names = FALSE)
+  	
+  ### !!!! NEED TO CHECK IF THIS IS RIGHT !!!! ####
+  ### Looks like it might be?                  ####
+  ### Assess via debug
+    idx <- unlist(split(1:n, folds)[V:1], use.names = FALSE)
   	cv_learner_pred <- matrix(NA, nrow = length(A), 
   	                          ncol = ifelse(is.null(remove_index), length(learners),
   	                                        length(learners) - length(remove_index)))
