@@ -130,7 +130,7 @@ get_ate_cv_Q_pred <- function(Y, V, all_fit_tasks, all_fits, all_sl, folds,
     cv_learner_pred <- c(cv_learner_pred_0, cv_learner_pred_1)
   }
 	if(compute_superlearner){
-    cv_sl_pred_0 <- cv_sl_pred_1 <- rep(NA, 2*length(Y))
+    cv_sl_pred_0 <- cv_sl_pred_1 <- rep(NA, length(Y))
     tmp <- lapply(all_out, "[[", "sl_pred") # list 2x 
     cv_sl_pred_0[idx] <- unlist(lapply(tmp, function(x){ nr <- length(x)/2; return(x[1:nr]) }), use.names = FALSE)
     cv_sl_pred_1[idx] <- unlist(lapply(tmp, function(x){ nr <- length(x)/2; return(x[(nr+1):(2*nr)]) }), use.names = FALSE)
