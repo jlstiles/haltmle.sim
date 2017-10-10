@@ -3,6 +3,7 @@ find_missing_files <- function(tag = "out",
                                parm_values = list(n = c(200,1000),
                                                   seed = 1:1000,
                                                   r2 = c(0.01, seq(0.101, 0.901, by = 0.1))),
+                               full_parm = NULL,
                                folder = "~/haltmle.sim/out"){
 	all_files <- list.files(folder)
 	tag_files <- all_files[grepl(tag, all_files)]
@@ -15,7 +16,9 @@ find_missing_files <- function(tag = "out",
 	})
 	done_parm <- data.frame(Reduce(rbind, parm_list))
 	names(done_parm) <- parm
-	full_parm <- expand.grid(parm_values)
+	if(is.null(full_parm)){
+		full_parm <- expand.grid(parm_values)
+	}
 	rbinded_parm <- rbind(done_parm,full_parm)
 	left_parm <- rbinded_parm[!(duplicated(rbinded_parm) | duplicated(rbinded_parm, fromLast = TRUE)), ]
 

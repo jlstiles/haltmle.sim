@@ -24,9 +24,9 @@ cd haltmle.sim
 # random mechanisms
 ./sce.sh ./cent.R redos_b12_V4
 # kang and schafer
-./sce_ks.sh ./cent_ks.R ks_v2
+./sce_ks.sh ./cent_ks.R ks_new_v1
 # sin wave
-./sce_sin.sh ./cent_sin.R sin_b1_v1
+./sce_sin.sh ./cent_sin.R sin_redos_v2
 
 #-----------------------
 cd ~/Dropbox/R/haltmle.sim/sandbox

@@ -233,7 +233,7 @@ get_ps_fit <- function(task, folds, W, A, sl_control){
 
 get_ate_cv_g_pred <- function(A, V, all_fit_tasks, all_fits, all_sl, folds, 
                              sl_control, return_learner_fits = TRUE,
-                             learners, remove_index = NULL, compute_superlearner){
+                             learners, remove_index = NULL, compute_superlearner = TRUE){
 	n <- length(A)
 	train_matrix <- combn(V, V-1)
 	all_out <- lapply(split(train_matrix,col(train_matrix)), function(tr){
@@ -366,7 +366,8 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 	                     sl_control = sl_control_Q)
 
 	    cv_pred_rm <- get_ate_cv_Q_pred(Y, V, all_fit_tasks, all_fits, all_sl_rm, folds, 
-	                             sl_control_Q, learners = learners, remove_index = remove_index)
+	                             sl_control_Q, learners = learners, remove_index = remove_index,
+                               compute_superlearner = compute_superlearner)
 	    # predictions for sl with hal removed 
 	    sl_pred_rm <- do.call(sl_control_Q$ensemble_fn, args = list(pred = pred[,-remove_index], weight = 
                                                            all_sl_rm[[1]]$sl_weight))
@@ -453,7 +454,8 @@ estimate_nuisance <- function(Y, W, A, V = 5, learners,
 	                                                           all_sl_rm[[1]]$sl_weight))
 
 	    cv_pred_rm <- get_ate_cv_g_pred(A, V, all_fit_tasks, all_fits, all_sl_rm, folds, 
-	                             sl_control_g, learners = learners, remove_index = remove_index)
+	                             sl_control_g, learners = learners, remove_index = remove_index,
+                               compute_superlearner = compute_superlearner)
 	   }
     }
 

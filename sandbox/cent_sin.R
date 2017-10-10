@@ -37,7 +37,7 @@ library(hal9001, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.
 library(drtmle, lib.loc = "/home/dbenkese/R/x86_64-unknown-linux-gnu-library/3.2")
 library(SuperLearner)
 # full parm
-ns <- c(200, 1000, 5000)
+ns <- c(200,1000,5000)
 # ns <- c(200)
 bigB <- 1000
 four_period <- c(0.5, 1, 5, 10)
@@ -55,7 +55,17 @@ parm_g <- expand.grid(seed=1:bigB,
 parm_g <- parm_g[-which(parm_g$g_period == 0.5 | parm_g$g_period == 10), ]
 
 parm <- rbind(parm_Q, parm_g)
+# colnames(parm)[3:4] <- c("Qp","gp")
 
+# redo_parm <- find_missing_files(tag = "sin",
+#                            # parm needs to be in same order as 
+#                            # file saves -- should make this more general...
+#                            parm = c("n", "seed", "Qp", "gp"),
+#                            full_parm = parm)
+# parm <- redo_parm
+# save(parm, file = "~/haltmle.sim/scratch/remain_sin_sims.RData")
+load("~/haltmle.sim/scratch/remain_sin_sims.RData")
+names(parm)[3:4] <- c("Q_period","g_period")
 # directories to save in 
 saveDir <- "~/haltmle.sim/out/"
 scratchDir <- "~/haltmle.sim/scratch/"
@@ -119,41 +129,33 @@ if (args[1] == 'run') {
 
 # merge job ###########################
 if (args[1] == 'merge') {
-  # n <- sum <- slFull <- slDrop <- cand <- NULL
-  # # get summary
+  format_result <- function(out){
+    tmle_os_list <- lapply(out, function(l){
+      # browser()
+      cv_est <- grepl("cv_", names(l))
+      for(i in 1:length(l)){
+        l[[i]] <- data.frame(as.list(l[[i]]))
+      }
+      for(i in 1:length(l)){
+        if(cv_est[i]){
+          l[[i]]$cv_ci_l <- l[[i]]$est - qnorm(0.975)*l[[i]]$se
+          l[[i]]$cv_ci_u <- l[[i]]$est + qnorm(0.975)*l[[i]]$se
+          l[[i]]$cov_cv_ci <- l[[i]]$cv_ci_l < truth & l[[i]]$cv_ci_u > truth
+        }else{
+          l[[i]]$ci_l <- l[[i]]$est - qnorm(0.975)*l[[i]]$se
+          l[[i]]$ci_u <- l[[i]]$est + qnorm(0.975)*l[[i]]$se
+          l[[i]]$cov_ci <- l[[i]]$ci_l < truth & l[[i]]$ci_u > truth
+          l[[i]]$cv_ci_l <- l[[i]]$est - qnorm(0.975)*l[[i+1]]$se
+          l[[i]]$cv_ci_u <- l[[i]]$est + qnorm(0.975)*l[[i+1]]$se
+          l[[i]]$cov_cv_ci <- l[[i]]$cv_ci_l < truth & l[[i]]$cv_ci_u > truth
+        }
+      }
+      return(l)
+    })
+    return(tmle_os_list)
+  }
 
-  # # load all files in saveDir
-  # allf <- list.files(saveDir)
-  # fullf <- allf[grep("Full",allf)]
-  # for(i in 1:length(allf)){
-  #   if(i %% 100 == 0){ cat(i,"\n") }
-  #   out <- get(load(paste0(saveDir,allf[i])))
-  #   tmp <- strsplit(allf[i], "=")
-  #   n <- c(n, as.numeric(strsplit(tmp[[1]][2],"_seed")[[1]][1]))
-  #   slFull <- rbind(slFull, out[[1]][[1]]$diff)
-  #   slDrop <- rbind(slDrop, out[[2]][[1]]$diff)
-  #   cand <- rbind(cand, Reduce(c, lapply(out[[1]][[3]], function(x){x$diff})))
-
-  #   # count outliers in data set
-  #   dat <- get(load(paste0(scratchDir,gsub("drawOut","draw",allf[i]))))          
-  #   tmp <- haltmle.sim:::summary.makeRandomData(dat)
-  #   sum <- rbind(sum, unlist(tmp))
-  # }
-  # algo <- c("SL.glm","SL.bayesglm", 
-  #           "SL.earth",
-  #           "SL.stepAIC","SL.step",
-  #           "SL.step.forward", "SL.step.interaction",
-  #           "SL.gam", "SL.gbm.caret1", "SL.randomForest.caret1",
-  #           "SL.svmLinear.caret1",
-  #           "SL.nnet.caret1",
-  #           "SL.rpart.caret1", "SL.mean","SL.hal")
   
-  # allOut <- data.frame(n, slFull, slDrop, cand, sum)
-  # names(allOut) <- c("n",paste0("slFull.",c("est","cil","ciu")),
-  #                 paste0("slDrop.",c("est","cil","ciu")), 
-  #                 outer(algo,c(".est",".cil",".ciu"), FUN=paste0),
-  #                 names(unlist(tmp)))
-  # save(allOut, file=paste0(saveDir,"allOut.RData"))
 }
 
 
