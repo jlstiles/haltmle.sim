@@ -128,8 +128,7 @@ makeRandomData <- function(n,
                            minR2 = 0.01, maxR2 = 0.99,
                            ...){
 	# draw random number of covariates
-	D <- round(runif(1, 0.5, maxD+0.5))
-
+  D <- sample(1:maxD, 1)
 	#----------------------------------------------------------------------
 	# Simulate W	
 	#----------------------------------------------------------------------
