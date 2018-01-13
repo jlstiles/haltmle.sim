@@ -203,7 +203,7 @@ makeRandomData <- function(n,
 			# empty list
 			bivG0 <- vector(mode="list",length=Mg2)
 			# all two-way column combinations
-			comb <- combn(D,2)
+			comb <- as.matrix(combn(D,2))
 			# randomly sample Mg2 two-way interactions without replacement
 			combCols <- sample(1:ncol(comb),Mg2,replace = TRUE)
 			for(m in 1:Mg2){
@@ -229,7 +229,7 @@ makeRandomData <- function(n,
 			# empty list
 			triG0 <- vector(mode="list",length=Mg3)
 			# all three way choices of columns
-			comb <- combn(D, 3)
+			comb <- as.matrix(combn(D, 3))
 			# randomly sample Mg3 three-way interactions without replacement
 			combCols <- sample(1:ncol(comb),Mg3,replace = TRUE)
 			for(m in 1:Mg3){
@@ -254,7 +254,7 @@ makeRandomData <- function(n,
 			# empty list
 			quadG0 <- vector(mode="list",length=Mg4)
 			# all four way choices of columns
-			comb <- combn(D, 4)
+			comb <- as.matrix(combn(D, 4))
 			# randomly sample Mg3 four-way interactions without replacement
 			combCols <- sample(1:ncol(comb), Mg4, replace = TRUE)
 			for(m in 1:Mg4){
@@ -331,7 +331,7 @@ makeRandomData <- function(n,
 	if(MQ2 > 0 & D > 0){
 		bivQ0 <- vector(mode="list",length=MQ2)
 		# all combinations of columns
-		comb <- combn(D+1,2)
+		comb <- as.matrix(combn(D+1,2))
 		# randomly sample columns
 		combCols <- sample(1:ncol(comb),MQ2, replace = TRUE)
 		for(m in 1:MQ2){
@@ -357,7 +357,7 @@ makeRandomData <- function(n,
 		# empty
 		triQ0 <- vector(mode="list",length=MQ3)
 		# all three-way column combinations
-		comb <- combn(D+1,3)
+		comb <- as.matrix(combn(D+1,3))
 		# randomly sample three choices of combinations without replacement
 		combCols <- sample(1:ncol(comb),MQ3, replace = TRUE)
 		for(m in 1:MQ3){
@@ -382,7 +382,7 @@ makeRandomData <- function(n,
 		# empty
 		quadQ0 <- vector(mode="list",length=MQ4)
 		# all four-way column combinations
-		comb <- combn(D+1, 4)
+		comb <- as.matrix(combn(D+1, 4))
 		# randomly sample four choices of combinations without replacement
 		combCols <- sample(1:ncol(comb), MQ4, replace = TRUE)
 		for(m in 1:MQ4){
