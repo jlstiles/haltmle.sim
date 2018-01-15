@@ -189,10 +189,12 @@ makeRandomData <- function(n,
 
 	# initialize empty
 	logitg0 <- rep(0, n)
-
+  its = -1
 	# make sure there are at least some A in each group
 	A <- rep(0, n)
 	while(sum(A == 1) < minObsA | sum(A==0) < minObsA){
+	  its = its+1
+	  print(its)
 		# univariate
 		if(Mg1 > 0){
 			uniG0 <- vector(mode="list", length = Mg1)
