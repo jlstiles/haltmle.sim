@@ -161,16 +161,31 @@ makeRandomData <- function(n,
 	# Simulate propensity
 	#----------------------------------------------------------------------
 	# draw random number of main terms
-	Mg1 <- round(runif(1, -0.5, D + 0.5))
+	Mg1 <- sample(1:D, 1)
 
 	# draw random number of two-way interaction terms
-	Mg2 <- round(runif(1, -0.5, D + 0.5))
+	if (D > 1) {
+	  Dchoose2 <- gamma(D+1)/(gamma(D-1)*gamma(3))
+	  Mg2 <- sample(1:Dchoose2, 1)
+	} else {
+	  Mg2 = 0
+	}
 
 	# draw random number of three-way interaction terms
-	Mg3 <- round(runif(1, -0.5, D + 0.5))
+	if (D > 2) {
+	  Dchoose2 <- gamma(D+1)/(gamma(D-2)*gamma(4))
+	  Mg3 <- sample(1:Dchoose3, 1)
+	} else {
+	  Mg3 = 0
+	}
 
 	# draw random number of four-way interaction terms
-	Mg4 <- round(runif(1, -0.5, D + 0.5))
+	if (D > 3) {
+	  Dchoose2 <- gamma(D+1)/(gamma(D-3)*gamma(5))
+	  Mg4 <- sample(1:Dchoose4, 1)
+	} else {
+	  Mg4 = 0
+	}
 
 	# initialize empty
 	logitg0 <- rep(0, n)
