@@ -214,7 +214,7 @@ makeRandomData <- function(n,
 			uniG0 <- NULL
 		}
 		# two-way interactions
-		if(Mg2 > 0 &  D > 1){
+		if(Mg2 > 0) {
 			# empty list
 			bivG0 <- vector(mode="list",length=Mg2)
 			# all two-way column combinations
@@ -240,7 +240,7 @@ makeRandomData <- function(n,
 		}
 
 		#trivariate
-		if(Mg3 > 0 & D > 2){
+		if(Mg3 > 0) {
 			# empty list
 			triG0 <- vector(mode="list",length=Mg3)
 			# all three way choices of columns
@@ -265,7 +265,7 @@ makeRandomData <- function(n,
 			triG0 <- NULL
 		}
 		# quadravariate
-		if(Mg4 > 0 & D > 3){
+		if(Mg4 > 0) {
 			# empty list
 			quadG0 <- vector(mode="list",length=Mg4)
 			# all four way choices of columns
