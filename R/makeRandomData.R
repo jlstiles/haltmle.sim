@@ -165,24 +165,24 @@ makeRandomData <- function(n,
 
 	# draw random number of two-way interaction terms
 	if (D > 1) {
-	  Dchoose2 <- gamma(D+1)/(gamma(D-1)*gamma(3))
-	  Mg2 <- sample(1:Dchoose2, 1)
+	  num2 = min(D, gamma(D+1)/gamma(D-1)/gamma(3))
+	  Mg2 <- sample(1:num2, 1)
 	} else {
 	  Mg2 = 0
 	}
 
 	# draw random number of three-way interaction terms
 	if (D > 2) {
-	  Dchoose3 <- gamma(D+1)/(gamma(D-2)*gamma(4))
-	  Mg3 <- sample(1:Dchoose3, 1)
+	  num3 = min(D, gamma(D+1)/gamma(D-2)/gamma(4))
+	  Mg3 <- sample(1:num3, 1)
 	} else {
 	  Mg3 = 0
 	}
 
 	# draw random number of four-way interaction terms
 	if (D > 3) {
-	  Dchoose4 <- gamma(D+1)/(gamma(D-3)*gamma(5))
-	  Mg4 <- sample(1:Dchoose4, 1)
+	  num4 = min(D, gamma(D+1)/gamma(D-3)/gamma(5))
+	  Mg4 <- sample(1:num4, 1)
 	} else {
 	  Mg4 = 0
 	}
