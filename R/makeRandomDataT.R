@@ -128,44 +128,6 @@ makeRandomDataT <- function(n,
                            minR2 = 0.01, maxR2 = 0.99, pos = .005, skewing = c(-1,1),
                            ...) {
   # draw random number of covariates
-
-  func.distW = c("uniformW","normalW","bernoulliW","binomialW","gammaW",
-                 "normalWCor","bernoulliWCor","uniformWCor", "gammaPointMassW",
-                 "binomialFracW","normalPointMassW")
-  funcG0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
-                 "dNormUni","qGammaUni","dNormMixUni","cubicSplineUni",
-                 "linSplineUni")
-  funcG0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
-                 "dNormAddBiv","dNormMultBiv","polyJumpBiv",
-                 "sinJumpBiv","dNormMultJumpBiv","linSplineBiv")
-  funcG0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
-                 "linJump2Tri","linJump1Tri","polyJump2Tri",
-                 "polyJump1Tri","sinJump2Tri","sinJump1Tri",
-                 "dNormAddTri","dNormMultTri","dNormMultJump2Tri",
-                 "dNormMultJump1Tri","pLogisAddTri")
-  funcG0.quad = c("linQuad", "polyQuad", "sinQuad", "jumpQuad",
-                  "linJump2Quad","linJump1Quad","polyJump2Quad",
-                  "polyJump1Quad","sinJump2Quad","sinJump1Quad",
-                  "dNormAddQuad","dNormMultQuad","dNormMultJump2Quad",
-                  "dNormMultJump1Quad","pLogisAddQuad")
-  funcQ0.uni = c("linUni","polyUni","sinUni","jumpUni","pLogisUni",
-                 "dNormUni","qGammaUni","dNormMixUni","cubicSplineUni",
-                 "linSplineUni")
-  funcQ0.biv = c("linBiv","polyBiv","sinBiv","jumpBiv",
-                 "dNormAddBiv","dNormMultBiv","polyJumpBiv",
-                 "sinJumpBiv","dNormMultJumpBiv","linSplineBiv")
-  funcQ0.tri = c("linTri", "polyTri", "sinTri", "jumpTri",
-                 "linJump2Tri","linJump1Tri","polyJump2Tri",
-                 "polyJump1Tri","sinJump2Tri","sinJump1Tri",
-                 "dNormAddTri","dNormMultTri","dNormMultJump2Tri",
-                 "dNormMultJump1Tri","pLogisAddTri")
-  funcQ0.quad = c("linQuad", "polyQuad", "sinQuad", "jumpQuad",
-                  "linJump2Quad","linJump1Quad","polyJump2Quad",
-                  "polyJump1Quad","sinJump2Quad","sinJump1Quad",
-                  "dNormAddQuad","dNormMultQuad","dNormMultJump2Quad",
-                  "dNormMultJump1Quad","pLogisAddQuad")
-  errY = c("normalErr","uniformErr","gammaErr","normalErrAW","uniformErrAW")
-
   D <- sample(1:maxD, 1)
   #----------------------------------------------------------------------
   # Simulate W
