@@ -161,40 +161,23 @@ makeRandomData <- function(n,
 	# Simulate propensity
 	#----------------------------------------------------------------------
 	# draw random number of main terms
-	Mg1 <- sample(1:D, 1)
+	Mg1 <- round(runif(1, -0.5, D + 0.5))
 
 	# draw random number of two-way interaction terms
-	if (D > 1) {
-	  num2 = min(D, gamma(D+1)/gamma(D-1)/gamma(3))
-	  Mg2 <- sample(1:num2, 1)
-	} else {
-	  Mg2 = 0
-	}
+	Mg2 <- round(runif(1, -0.5, D + 0.5))
 
 	# draw random number of three-way interaction terms
-	if (D > 2) {
-	  num3 = min(D, gamma(D+1)/gamma(D-2)/gamma(4))
-	  Mg3 <- sample(1:num3, 1)
-	} else {
-	  Mg3 = 0
-	}
+	Mg3 <- round(runif(1, -0.5, D + 0.5))
 
 	# draw random number of four-way interaction terms
-	if (D > 3) {
-	  num4 = min(D, gamma(D+1)/gamma(D-3)/gamma(5))
-	  Mg4 <- sample(1:num4, 1)
-	} else {
-	  Mg4 = 0
-	}
+	Mg4 <- round(runif(1, -0.5, D + 0.5))
 
 	# initialize empty
 	logitg0 <- rep(0, n)
-  its = -1
+
 	# make sure there are at least some A in each group
 	A <- rep(0, n)
 	while(sum(A == 1) < minObsA | sum(A==0) < minObsA){
-	  its = its+1
-	  print(its)
 		# univariate
 		if(Mg1 > 0){
 			uniG0 <- vector(mode="list", length = Mg1)
@@ -216,7 +199,7 @@ makeRandomData <- function(n,
 			uniG0 <- NULL
 		}
 		# two-way interactions
-		if(Mg2 > 0) {
+		if(Mg2 > 0 &  D > 1){
 			# empty list
 			bivG0 <- vector(mode="list",length=Mg2)
 			# all two-way column combinations
@@ -242,7 +225,7 @@ makeRandomData <- function(n,
 		}
 
 		#trivariate
-		if(Mg3 > 0) {
+		if(Mg3 > 0 & D > 2){
 			# empty list
 			triG0 <- vector(mode="list",length=Mg3)
 			# all three way choices of columns
@@ -267,7 +250,7 @@ makeRandomData <- function(n,
 			triG0 <- NULL
 		}
 		# quadravariate
-		if(Mg4 > 0) {
+		if(Mg4 > 0 & D > 3){
 			# empty list
 			quadG0 <- vector(mode="list",length=Mg4)
 			# all four way choices of columns
