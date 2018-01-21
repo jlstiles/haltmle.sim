@@ -85,7 +85,6 @@
 #' \item{distErrY}{A list containing relevant information needed to reproduce data sets}
 #' \item{divideLogitG0}{A numeric of the scaling factor for the propensity}
 #' @export
-
 makeRandomDataT <- function(n,
                            maxD,
                            minObsA = 30,
