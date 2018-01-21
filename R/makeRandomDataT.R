@@ -359,11 +359,11 @@ makeRandomDataT <- function(n,
   logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
   logitg0[plogis(logitg0) > 1 - minG0] <- qlogis(1 - minG0)
 
-  # simulate A
-  chosen rows at random from W:
+  # chosen rows at random from W:
   Wrows = sample(1:N,n)
-
   W = W[Wrows,]
+
+  # simulate A
   A <- rbinom(n, 1, plogis(logitg0[Wrows]))
 
   # matrix with A and W
