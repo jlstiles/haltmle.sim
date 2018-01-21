@@ -333,7 +333,7 @@ makeRandomDataT <- function(n,
   logitg0 = logitg0[Wrows]
 
   # simulate A
-  A <- rbinom(n, 1, plogis(logitg0[Wrows]))
+  A <- rbinom(n, 1, plogis(logitg0))
 
   # matrix with A and W
   AW <- cbind(A, W)
