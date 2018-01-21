@@ -521,10 +521,10 @@ makeRandomDataT <- function(n,
                 funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri, funcG0.quad = funcG0.quad,
                 funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri,
                 funcQ0.quad = funcQ0.quad, its = its, skewage = skewage)
-    class(out) <- "makeRandomDataT"
+    class(out) <- "makeRandomData"
 
     # get summary
-    bigObs <- remakeRandomDataT(n = 1e5, object = out)
+    bigObs <- remakeRandomData(n = 1e5, object = out)
     currR2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
     # cat("Current R2 = ", currR2)
   }
