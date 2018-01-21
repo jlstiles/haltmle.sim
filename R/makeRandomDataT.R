@@ -165,12 +165,16 @@ makeRandomDataT <- function(n,
 
   # draw random number of two-way interaction terms
   Mg2 <- sample(0:D, 1)
+  # but Mg2 cannot be greater than the total number of combos
+  Mg2 <- ifelse(D > 1, min(Mg2, gamma(D+1)/gamma(3)/gamma(D-1)), 0)
 
   # draw random number of three-way interaction terms
   Mg3 <- sample(0:D, 1)
+  Mg3 <- ifelse(D > 2, min(Mg3, gamma(D+1)/gamma(4)/gamma(D-2)), 0)
 
   # draw random number of four-way interaction terms
   Mg4 <- sample(0:D, 1)
+  Mg4 <- ifelse(D > 3, min(Mg4, gamma(D+1)/gamma(5)/gamma(D-3)), 0)
 
   # univariate
   if(Mg1 > 0){
@@ -199,7 +203,7 @@ makeRandomDataT <- function(n,
   # two-way interactions
   if(Mg2 > 0 &  D > 1){
     # all two-way column combinations
-    comb <- combn(D,2)
+    comb <- as.matrix(combn(D,2))
     # randomly sample Mg2 two-way interactions without replacement
     combCols <- sample(1:ncol(comb),Mg2,replace = TRUE)
     bivG0 = lapply(1:Mg2, FUN  = function(m) {
@@ -227,7 +231,7 @@ makeRandomDataT <- function(n,
   #trivariate
   if(Mg3 > 0 & D > 2){
     # all three way choices of columns
-    comb <- combn(D, 3)
+    comb <- as.matrix(combn(D, 3))
     # randomly sample Mg3 three-way interactions without replacement
     combCols <- sample(1:ncol(comb),Mg3,replace = TRUE)
     triG0 = lapply(1:Mg3, FUN  = function(m) {
@@ -261,7 +265,7 @@ makeRandomDataT <- function(n,
     # empty list
     quadG0 <- vector(mode="list",length=Mg4)
     # all four way choices of columns
-    comb <- combn(D, 4)
+    comb <- as.matrix(combn(D, 4))
     # randomly sample Mg3 four-way interactions without replacement
     combCols <- sample(1:ncol(comb), Mg4, replace = TRUE)
     quadG0 = lapply(1:Mg4, FUN  = function(m) {
@@ -336,12 +340,28 @@ makeRandomDataT <- function(n,
   #----------------------------------------------------------------------
   # draw random number of main terms between 0 and D + 1, where we set
   # no minimum, which allows there to be cases of just pure noise
-  MQ1 <- round(runif(1, -0.5, D + 1.5))
+  MQ1 <- sample(0:(D+1), 1)
 
-  # draw random number of interaction terms
-  MQ2 <- round(runif(1, -0.5, D + 1.5))
-  MQ3 <- round(runif(1, -0.5, D + 1.5))
-  MQ4 <- round(runif(1, -0.5, D + 1.5))
+  # draw random number of two-way interaction terms
+  MQ2 <- sample(0:(D+1), 1)
+
+  # but Mg2 cannot be greater than the total number of combos
+  MQ2 <- ifelse(D > 0, min(MQ2, gamma(D+2)/gamma(3)/gamma(D)), 0)
+
+  # draw random number of three-way interaction terms
+  MQ3 <- sample(0:(D+1), 1)
+  MQ3 <- ifelse(D > 1, min(MQ3, gamma(D+2)/gamma(4)/gamma(D-1)), 0)
+
+  # draw random number of four-way interaction terms
+  MQ4 <- sample(0:(D+1), 1)
+  MQ4 <- ifelse(D > 2, min(MQ4, gamma(D+2)/gamma(5)/gamma(D-2)), 0)
+
+  # MQ1 <- round(runif(1, -0.5, D + 1.5))
+  #
+  # # draw random number of interaction terms
+  # MQ2 <- round(runif(1, -0.5, D + 1.5))
+  # MQ3 <- round(runif(1, -0.5, D + 1.5))
+  # MQ4 <- round(runif(1, -0.5, D + 1.5))
 
   # empty
   Q0 <- rep(0, n)
@@ -371,7 +391,7 @@ makeRandomDataT <- function(n,
   if(MQ2 > 0){
     bivQ0 <- vector(mode="list",length=MQ2)
     # all combinations of columns
-    comb <- combn(D+1,2)
+    comb <- as.matrix(combn(D+1,2))
     # randomly sample columns
     combCols <- sample(1:ncol(comb),MQ2, replace = TRUE)
     for(m in 1:MQ2){
@@ -397,7 +417,7 @@ makeRandomDataT <- function(n,
     # empty
     triQ0 <- vector(mode="list",length=MQ3)
     # all three-way column combinations
-    comb <- combn(D+1,3)
+    comb <- as.matrix(combn(D+1,3))
     # randomly sample three choices of combinations without replacement
     combCols <- sample(1:ncol(comb),MQ3, replace = TRUE)
     for(m in 1:MQ3){
@@ -422,7 +442,7 @@ makeRandomDataT <- function(n,
     # empty
     quadQ0 <- vector(mode="list",length=MQ4)
     # all four-way column combinations
-    comb <- combn(D+1, 4)
+    comb <- as.matrix(combn(D+1, 4))
     # randomly sample four choices of combinations without replacement
     combCols <- sample(1:ncol(comb), MQ4, replace = TRUE)
     for(m in 1:MQ4){
