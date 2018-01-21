@@ -327,7 +327,7 @@ makeRandomDataT <- function(n,
 
   # chosen rows at random from W:
   Wrows = sample(1:N,n)
-  W = W[Wrows,]
+  W = as.matrix(W[Wrows,])
 
   # choose corresponding logitg0
   logitg0 = logitg0[Wrows]
