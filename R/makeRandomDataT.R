@@ -329,6 +329,9 @@ makeRandomDataT <- function(n,
   Wrows = sample(1:N,n)
   W = W[Wrows,]
 
+  # choose corresponding logitg0
+  logitg0 = logitg0[Wrows]
+
   # simulate A
   A <- rbinom(n, 1, plogis(logitg0[Wrows]))
 
