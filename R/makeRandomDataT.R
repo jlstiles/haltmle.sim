@@ -312,13 +312,13 @@ makeRandomDataT <- function(n,
   its = 0
 
   while (tol & its < 20) {
-    tol = mean(plogis(.8^its*logitg0 + skewage) < minG0) > pos |
-      mean(plogis(.8^its*logitg0 + skewage) > (1 - minG0)) >
+    tol = mean(plogis(.8^its*logitg0 + .8^its*skewage) < minG0) > pos |
+      mean(plogis(.8^its*logitg0 + .8^its*skewage) > (1 - minG0)) >
       pos
     its = its + 1
   }
 
-  logitg0 = .8^its*logitg0 + skewage
+  logitg0 = .8^its*logitg0 + .8^its*skewage
 
   # truncate for positivity violations
   logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
