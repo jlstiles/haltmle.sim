@@ -306,7 +306,6 @@ makeRandomDataT <- function(n,
   # skew randomly according to skewing argument
   logitg0 = rowSums(as.matrix(M_c))
   skewage = runif(1, skewing[1],skewing[2])
-  skew_vec = skewage*rep(1,N)
 
   # (1 - 2pos)*100% of all data is within positivity range so not truncating everything
   tol = TRUE
@@ -319,7 +318,7 @@ makeRandomDataT <- function(n,
     its = its + 1
   }
 
-  logitg0 = .8^its*logitg0 + skew_vec
+  logitg0 = .8^its*logitg0 + skewage
 
   # truncate for positivity violations
   logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
