@@ -360,7 +360,11 @@ makeRandomDataT <- function(n,
   logitg0[plogis(logitg0) > 1 - minG0] <- qlogis(1 - minG0)
 
   # simulate A
-  A <- rbinom(1000, 1, plogis(logitg0))
+  chosen rows at random from W:
+  Wrows = sample(1:N,n)
+
+  W = W[Wrows,]
+  A <- rbinom(n, 1, plogis(logitg0[Wrows]))
 
   # matrix with A and W
   AW <- cbind(A, W)
@@ -517,10 +521,10 @@ makeRandomDataT <- function(n,
                 funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri, funcG0.quad = funcG0.quad,
                 funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri,
                 funcQ0.quad = funcQ0.quad, its = its, skewage = skewage)
-    class(out) <- "makeRandomData"
+    class(out) <- "makeRandomDataT"
 
     # get summary
-    bigObs <- remakeRandomData(n = 1e5, object = out)
+    bigObs <- remakeRandomDataT(n = 1e5, object = out)
     currR2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
     # cat("Current R2 = ", currR2)
   }
