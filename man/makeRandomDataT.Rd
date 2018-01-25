@@ -56,7 +56,7 @@ are used to generate error terms for the outcome regression.}
 
 \item{minG0}{The minimum value for the propensity score (default 0.01).}
 
-\item{pos}{(1-2*pos)100% of pscores fall withing minG0 and 1- minG0, default is .005}
+\item{pos}{(1-2*pos)100\% of pscores fall withing minG0 and 1- minG0, default is .005}
 
 \item{distW.uncor}{A \code{vector} of \code{characters} that are functions in the global environment that
 generate covariates. These functions should have an associated parameter function with \code{"Parm"} added
