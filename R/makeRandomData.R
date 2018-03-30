@@ -426,7 +426,7 @@ makeRandomData <- function(n,
 	# make sure R2 is falling in proper range
 	ct <- 0
 	currR2 <- Inf
-	while(currR2 < minR2 | currR2 > maxR2){
+	while((currR2 < minR2 | currR2 > maxR2) & ct <= 20){
 		ct <- ct + 1
 		if(currR2 > maxR2){
 			mult <- 1.1^ct
