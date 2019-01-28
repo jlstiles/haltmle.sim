@@ -84,6 +84,7 @@
 #' \item{fnQ0}{A list of lists containing relevant information needed to reproduce data sets}
 #' \item{distErrY}{A list containing relevant information needed to reproduce data sets}
 #' \item{divideLogitG0}{A numeric of the scaling factor for the propensity}
+#' @example /inst/testing.R
 #' @export
 makeRandomDataT <- function(n,
                            maxD,
@@ -165,14 +166,17 @@ makeRandomDataT <- function(n,
 
   # draw random number of two-way interaction terms
   Mg2 <- sample(0:D, 1)
-  # but Mg2 cannot be greater than the total number of combos
+  # draw random number of two-way interaction terms.  D is the num of
+  # covs so must be  > 1 to proceed
   Mg2 <- ifelse(D > 1, min(Mg2, gamma(D+1)/gamma(3)/gamma(D-1)), 0)
 
-  # draw random number of three-way interaction terms
+  # draw random number of three-way interaction terms.  D is the num of
+  # covs so must be  > 2 to proceed
   Mg3 <- sample(0:D, 1)
   Mg3 <- ifelse(D > 2, min(Mg3, gamma(D+1)/gamma(4)/gamma(D-2)), 0)
 
-  # draw random number of four-way interaction terms
+  # draw random number of four-way interaction terms.  D is the num of
+  # covs so must be  > 3 to proceed
   Mg4 <- sample(0:D, 1)
   Mg4 <- ifelse(D > 3, min(Mg4, gamma(D+1)/gamma(5)/gamma(D-3)), 0)
 

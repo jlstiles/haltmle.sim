@@ -5,7 +5,7 @@ library(haltmle.sim)
 library(Simulations)
 
 # JL random dgp maker, has controls for blip variance and positivity protection
-ex = get.dgp(n = 1000, d = 4, minBV = .03, depth = 3, maxterms = 6, minterms = 3, mininters = 3, pos = .05,
+ex = get.dgp(n = 1000, d = 4, minBV = .03, depth = 3, maxterms = 6, minterms = 3, mininters = 3, pos = .1,
              skewing = c(-5,5))
 
 data = ex$DF
@@ -36,7 +36,7 @@ mean(ex$DF$A)
 
 # modifying Davids function to protect against positivity
 # and not give blank distributions
-exD = makeRandomDataT(n=1000, maxD=8, minObsA = 300, minG0 = .01, skewing = c(-2,2))
+exD = makeRandomDataT(n=1000, maxD=8, minObsA = 300, minG0 = .1, skewing = c(-2,2))
 exD1 = makeRandomData(n=1000, maxD=8, minObsA = 300, minG0 = .01)
 
 mean(exD$A$A)
