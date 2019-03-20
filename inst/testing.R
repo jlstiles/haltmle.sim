@@ -18,4 +18,5 @@ hist(exD$Q0, 100)
 # max and min pscore, new then old
 c(max(exD$g0), min(exD$g0))
 
-
+#remake the data set according to the same specs randomly chosen!
+remakeRandomData(100, exD)
