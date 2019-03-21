@@ -74,7 +74,7 @@
 #' are used to generate error terms for the outcome regression.
 #' @param minG0 The minimum value for the propensity score (default 0.01).
 #' @param pos (1-2*pos)100\% of pscores fall withing minG0 and 1- minG0, default is .005
-#' @param skewage default is c(-1,1). random add a skewing constant to the logit(pscores)
+#' @param skewing default is c(-1,1). random add a skewing constant to the logit(pscores)
 #' @return An object of class \code{"makeRandomData"} with the following entries
 #' \item{W}{A matrix of covariates}
 #' \item{A}{A vector of binary treatments}

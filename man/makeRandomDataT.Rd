@@ -58,13 +58,13 @@ are used to generate error terms for the outcome regression.}
 
 \item{pos}{(1-2*pos)100\% of pscores fall withing minG0 and 1- minG0, default is .005}
 
+\item{skewing}{default is c(-1,1). random add a skewing constant to the logit(pscores)}
+
 \item{distW.uncor}{A \code{vector} of \code{characters} that are functions in the global environment that
 generate covariates. These functions should have an associated parameter function with \code{"Parm"} added
 to the end of their name. See the format of the functions provided to understand their structure.}
 
 \item{distW.cor}{Same as above, but generates a correlated covariate}
-
-\item{skewage}{default is c(-1,1). random add a skewing constant to the logit(pscores)}
 }
 \value{
 An object of class \code{"makeRandomData"} with the following entries
@@ -134,4 +134,28 @@ Simulating Y \itemize{
 \item Call \code{errf} with randomly chosen parameters to draw \code{e}, an error for the outcome.
 \item Let \code{Y = Q0 + e}.
 }
+}
+\examples{
+# Generate a random distribution with max vars 8, up to 4-way interactions will be randomly created with
+# these variables. a randomly drawn number to skewing the pscore distribution, 100(1 - pos)\% of pscores
+# fall within minG0 and 1 - minG0
+exD = makeRandomDataT(n=1000, maxD=8, minObsA = 300, minG0 = .1, pos = 0.05, skewing = c(-2,2))
+
+mean(exD$A$A)
+
+# number of iterations to control positivity-max is 20
+exD$its
+exD$skewage*.8^exD$its
+
+# pscores
+hist(exD$g0, 100)
+
+# barQ
+hist(exD$Q0, 100)
+
+# max and min pscore, new then old
+c(max(exD$g0), min(exD$g0))
+
+#remake the data set according to the same specs randomly chosen!
+remakeRandomData(100, exD)
 }
