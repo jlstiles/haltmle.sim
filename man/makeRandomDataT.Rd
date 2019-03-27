@@ -142,16 +142,16 @@ Simulating Y \itemize{
 # fall within minG0 and 1 - minG0
 
 # right now it limits 2, 3 or 4 way interactions to be at most the number of main terms.
-exD = makeRandomDataT(n=1000, maxD=30, minD = 30, minObsA = 300, minG0 = .1, pos = 0.05, skewing = c(-1,1))
+exD = makeRandomDataT(n=1000, maxD=10, minD = 2, minObsA = 300, minG0 = 0.05, pos = 0.05, skewing = c(-1,1))
 # undebug(makeRandomDataT)
 exD$its
 exD$ct
 
-mean(exD$A$A)
+mean(exD$A)
 head(exD$W)
 # number of iterations to control positivity-max is 20
 exD$its
-exD$skewage*.8^exD$its
+exD$skewage*.6^exD$its
 
 # pscores
 hist(exD$g0, 100)
@@ -167,6 +167,8 @@ exD_1 = remakeRandomDataT(1000, exD)
 # undebug(remakeRandomDataT)
 # pscores
 hist(exD_1$g0, 100)
+hist(exD$g0, 100)
+
 mean(exD_1$g0)
 mean(exD_1$A)
 hist(exD$g0, 100)

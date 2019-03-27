@@ -323,7 +323,7 @@ makeRandomDataT <- function(n,
     its = its + 1
   }
 
-  logitg0 = .6^its*logitg0 + .8^its*skewage
+  logitg0 = .6^its*logitg0 + .6^its*skewage
 
   # truncate for positivity violations
   logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
@@ -501,7 +501,7 @@ makeRandomDataT <- function(n,
     }
     # compute Y
     Y <- Q0 + errOut
-    out <- list(W = W, A = data.frame(A=A), Y = data.frame(Y=Y), distW = distW,
+    out <- list(W = W, A = A, Y = Y, distW = distW,
                 minG0 = minG0, minR2 = minR2, maxR2 = maxR2, skewing = skewing, pos = pos,
                 fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0, quad = quadG0),
                 fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0, quad = quadQ0), distErrY = errYList,

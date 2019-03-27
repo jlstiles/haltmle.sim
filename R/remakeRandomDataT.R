@@ -109,7 +109,7 @@ remakeRandomDataT <- function(n, object, setA = NULL, setW = NULL, ...){
 
 		logitg0 = logitg0 - mean(logitg0)
 		# correct for positivity violations
-		logitg0 = .8^object$its*logitg0 + .8^object$its*object$skewage
+		logitg0 = .6^object$its*logitg0 + .6^object$its*object$skewage
 
 		# truncate for positivity violations
 		logitg0[plogis(logitg0) < object$minG0] <- qlogis(object$minG0)
