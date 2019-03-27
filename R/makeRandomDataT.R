@@ -1,4 +1,4 @@
-#' makeRandomData
+#' makeRandomDataT
 #'
 #' Simulate a random data generating distribution. See Details to see how it's done.
 #'
@@ -88,6 +88,7 @@
 #' @export
 makeRandomDataT <- function(n,
                            maxD,
+                           minD = 0,
                            minObsA = 30,
                            func.distW = c("uniformW","normalW","bernoulliW","binomialW","gammaW",
                                           "normalWCor","bernoulliWCor","uniformWCor", "gammaPointMassW",
@@ -129,7 +130,7 @@ makeRandomDataT <- function(n,
                            minR2 = 0.01, maxR2 = 0.99, pos = .005, skewing = c(-1,1),
                            ...) {
   # draw random number of covariates
-  D <- sample(1:maxD, 1)
+  if (minD==maxD) D = minD else D <- sample(minD:maxD, 1)
   #----------------------------------------------------------------------
   # Simulate W
   #----------------------------------------------------------------------
@@ -162,7 +163,7 @@ makeRandomDataT <- function(n,
   # Simulate propensity
   #----------------------------------------------------------------------
   # draw random number of main terms
-  Mg1 <- sample(1:D, 1)
+  Mg1 <- D
 
   # draw random number of two-way interaction terms
   Mg2 <- sample(0:D, 1)
@@ -315,14 +316,14 @@ makeRandomDataT <- function(n,
   tol = TRUE
   its = 0
 
-  while (tol & its < 20) {
+  while (tol & its < 10) {
     tol = mean(plogis(.8^its*logitg0 + .8^its*skewage) < minG0) > pos |
       mean(plogis(.8^its*logitg0 + .8^its*skewage) > (1 - minG0)) >
       pos
     its = its + 1
   }
 
-  logitg0 = .8^its*logitg0 + .8^its*skewage
+  logitg0 = .6^its*logitg0 + .8^its*skewage
 
   # truncate for positivity violations
   logitg0[plogis(logitg0) < minG0] <- qlogis(minG0)
@@ -347,7 +348,6 @@ makeRandomDataT <- function(n,
   # draw random number of main terms between 0 and D + 1, where we set
   # no minimum, which allows there to be cases of just pure noise
   MQ1 <- sample(0:(D+1), 1)
-
   # draw random number of two-way interaction terms
   MQ2 <- sample(0:(D+1), 1)
 
@@ -492,7 +492,7 @@ makeRandomDataT <- function(n,
   # make sure R2 is falling in proper range
   ct <- 0
   currR2 <- Inf
-  while(currR2 < minR2 | currR2 > maxR2){
+  while((currR2 < minR2 | currR2 > maxR2) & ct < 20){
     ct <- ct + 1
     if(currR2 > maxR2){
       mult <- 1.1^ct
@@ -502,17 +502,17 @@ makeRandomDataT <- function(n,
     # compute Y
     Y <- Q0 + errOut
     out <- list(W = W, A = data.frame(A=A), Y = data.frame(Y=Y), distW = distW,
-                minG0 = minG0, minR2 = minR2, maxR2 = maxR2,
+                minG0 = minG0, minR2 = minR2, maxR2 = maxR2, skewing = skewing, pos = pos,
                 fnG0 = list(uni = uniG0, biv = bivG0, tri = triG0, quad = quadG0),
                 fnQ0 = list(uni = uniQ0, biv = bivQ0, tri = triQ0, quad = quadQ0), distErrY = errYList,
                 Q0 = Q0, g0 = plogis(logitg0), errMult = mult, funcG0.uni = funcG0.uni,
                 funcG0.biv = funcG0.biv, funcG0.tri = funcG0.tri, funcG0.quad = funcG0.quad,
                 funcQ0.uni = funcQ0.uni, funcQ0.biv = funcQ0.biv, funcQ0.tri = funcQ0.tri,
-                funcQ0.quad = funcQ0.quad, its = its, skewage = skewage)
+                funcQ0.quad = funcQ0.quad, its = its, skewage = skewage, ct = ct)
     class(out) <- "makeRandomData"
 
     # get summary
-    bigObs <- remakeRandomData(n = 1e5, object = out)
+    bigObs <- remakeRandomDataT(n = 1e5, object = out)
     currR2 <- 1 - mean((bigObs$Y - bigObs$Q0)^2)/var(bigObs$Y)
     # cat("Current R2 = ", currR2)
   }
